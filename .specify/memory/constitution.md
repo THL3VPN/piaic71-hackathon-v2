@@ -1,55 +1,55 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+- Version change: n/a -> 1.0.0
+- Modified principles: initialized (Test-First Delivery; Typed Python 3.12+; Clean & Simple Code; SOLID OOP with Dataclasses; Decision Traceability via ADRs; Tooling & Quality Gates)
+- Added sections: Technical Stack & Constraints; Workflow & Quality Gates
+- Removed sections: none
+- Templates requiring updates: .specify/templates/plan-template.md ✅; .specify/templates/spec-template.md ✅; .specify/templates/tasks-template.md ✅
+- Follow-up TODOs: none
+-->
+# Piaic71 Hackathon v2 Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Test-First Delivery (TDD)
+Tests are written first, approved, and run to red before implementation; the team follows a strict red-green-refactor cycle with pytest. All tests must pass before merge, and coverage must remain at or above 80% for every change set. New code without failing tests is not allowed.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Typed Python 3.12+ Standard
+All runtime code targets Python 3.12+ and uses type hints everywhere (functions, methods, data structures, external interfaces). Type checks and runtime behavior must agree; signatures are part of the public contract and must be maintained.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Clean & Simple Code (KISS/DRY)
+Favor readability and minimal complexity: small, single-purpose functions; eliminate duplication; prefer clear control flow over cleverness. Refactor routinely during the green phase to keep the design small and easy to change.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. SOLID OOP with Dataclasses
+When modeling domain state, use dataclasses as the default structure. Apply SOLID principles for objects with behavior, keeping responsibilities narrow and dependencies explicit. Composition is favored over inheritance except where a stable abstraction is clear.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Decision Traceability via ADRs
+Material architectural or process decisions require an ADR before implementation. ADRs capture context, options, and consequences, and are stored under version control to keep reasoning auditable.
 
-### [PRINCIPLE_6_NAME]
+### VI. Tooling & Quality Gates
+Use the UV package manager for Python dependency and environment management, pytest for all testing, and git to track all project files. CI/local gates include: tests pass, coverage ≥80%, type hints present, and changes linked to relevant ADRs when decisions are involved.
 
+## Technical Stack & Constraints
 
-[PRINCIPLE__DESCRIPTION]
+- Language: Python 3.12+ with type hints across all code paths.
+- Dependency & environment management: UV; lockfiles committed.
+- Testing: pytest is mandatory; red-green-refactor enforced; coverage ≥80%.
+- Data modeling: dataclasses preferred for structured data.
+- Repository hygiene: all project files tracked in git; no untracked runtime artifacts.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Workflow & Quality Gates
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
-
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
-
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+1. Write ADRs for significant decisions before coding; reference them in related work.
+2. Define tests with pytest first; run to red; implement to green; refactor while keeping tests green.
+3. Enforce type hints and keep signatures current with behavior.
+4. Reject changes that drop coverage below 80% or bypass tests/linters.
+5. Code review verifies TDD evidence, typing, ADR links, and adherence to SOLID/KISS/DRY.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+- This constitution supersedes other guidance for engineering practice.
+- Amendments require a documented change proposal (referencing affected principles), review, and recorded approval; accompany with ADRs when altering process or architecture.
+- Versioning follows semantic rules: MAJOR for breaking/removing principles, MINOR for new principles or substantive guidance additions, PATCH for clarifications.
+- Compliance is checked in every review: TDD trace (red/green), type hints, ADR references, coverage threshold, and stack/tooling adherence.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2025-12-12 | **Last Amended**: 2025-12-12

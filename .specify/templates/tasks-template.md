@@ -8,7 +8,7 @@ description: "Task list template for feature implementation"
 **Input**: Design documents from `/specs/[###-feature-name]/`
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
-**Tests**: The examples below include test tasks. Tests are OPTIONAL - only include them if explicitly requested in the feature specification.
+**Tests**: Tests are mandatory and written first (pytest). Each story begins with failing tests; maintain ≥80% project coverage.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
@@ -24,6 +24,8 @@ description: "Task list template for feature implementation"
 - **Web app**: `backend/src/`, `frontend/src/`
 - **Mobile**: `api/src/`, `ios/src/` or `android/src/`
 - Paths shown below assume single project - adjust based on plan.md structure
+- Language/Version: Python 3.12+ with type hints everywhere; use dataclasses for data structures
+- Tooling: UV for dependency/env management; pytest for tests; git tracks all project files
 
 <!-- 
   ============================================================================
@@ -49,8 +51,9 @@ description: "Task list template for feature implementation"
 **Purpose**: Project initialization and basic structure
 
 - [ ] T001 Create project structure per implementation plan
-- [ ] T002 Initialize [language] project with [framework] dependencies
-- [ ] T003 [P] Configure linting and formatting tools
+- [ ] T002 Initialize Python 3.12+ project with UV-managed dependencies
+- [ ] T003 [P] Configure linting/formatting/type-checking and pytest
+- [ ] T004 Record initial ADR for architecture/process decisions if any
 
 ---
 
@@ -62,12 +65,12 @@ description: "Task list template for feature implementation"
 
 Examples of foundational tasks (adjust based on your project):
 
-- [ ] T004 Setup database schema and migrations framework
-- [ ] T005 [P] Implement authentication/authorization framework
-- [ ] T006 [P] Setup API routing and middleware structure
-- [ ] T007 Create base models/entities that all stories depend on
-- [ ] T008 Configure error handling and logging infrastructure
-- [ ] T009 Setup environment configuration management
+- [ ] T005 Setup database schema and migrations framework
+- [ ] T006 [P] Implement authentication/authorization framework
+- [ ] T007 [P] Setup API routing and middleware structure
+- [ ] T008 Create base models/entities that all stories depend on using dataclasses
+- [ ] T009 Configure error handling and logging infrastructure
+- [ ] T010 Setup environment configuration management
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -79,9 +82,9 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 1 (OPTIONAL - only if tests requested) ⚠️
+### Tests for User Story 1 (MANDATORY, write first) ⚠️
 
-> **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
+> **NOTE: Write these tests FIRST with pytest; ensure they FAIL before implementation**
 
 - [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
 - [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
@@ -105,7 +108,7 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 2 (OPTIONAL - only if tests requested) ⚠️
+### Tests for User Story 2 (MANDATORY, write first) ⚠️
 
 - [ ] T018 [P] [US2] Contract test for [endpoint] in tests/contract/test_[name].py
 - [ ] T019 [P] [US2] Integration test for [user journey] in tests/integration/test_[name].py
@@ -127,7 +130,7 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 3 (OPTIONAL - only if tests requested) ⚠️
+### Tests for User Story 3 (MANDATORY, write first) ⚠️
 
 - [ ] T024 [P] [US3] Contract test for [endpoint] in tests/contract/test_[name].py
 - [ ] T025 [P] [US3] Integration test for [user journey] in tests/integration/test_[name].py

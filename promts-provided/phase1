@@ -1,0 +1,19 @@
+for constitution
+
+Project principles and standards:
+- Write tests first (TDD approach)
+- Use Python 3.12+ with type hints everywhere
+- Keep code clean and easy to read
+- Document important decisions with ADRs
+- Follow essential OOP principles: SOLID, DRY, KISS
+
+Technical stack:
+- Python 3.12+ with UV package manager
+- pytest for testing
+- Keep all project files in git
+
+Quality requirements:
+- All tests must pass
+- At least 80% code coverage
+- Use dataclasses for data structures
+

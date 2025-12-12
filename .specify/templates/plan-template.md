@@ -17,21 +17,24 @@
   the iteration process.
 -->
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
+**Language/Version**: Python 3.12+ (required)  
+**Primary Dependencies**: UV-managed Python packages [list specifics]  
 **Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
+**Testing**: pytest (required)  
 **Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
 **Project Type**: [single/web/mobile - determines source structure]  
 **Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
+**Constraints**: Coverage ≥80%, type hints everywhere, ADR required for material decisions, plus domain constraints [fill in]  
 **Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- Tests are defined first (pytest), executed to red, then implemented to green; plan documents how TDD will be performed.
+- Python 3.12+ with type hints everywhere; dataclasses are the default for structured data.
+- UV is the package/environment manager; note any required system dependencies.
+- Quality bars: all planned changes must maintain ≥80% coverage; add ADR references for any significant design choices.
 
 ## Project Structure
 

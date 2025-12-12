@@ -18,6 +18,8 @@
   - Tested independently
   - Deployed independently
   - Demonstrated to users independently
+
+  Testing is written first (pytest) to drive implementation; capture expected coverage impact so the 80% project floor is preserved.
 -->
 
 ### User Story 1 - [Brief Title] (Priority: P1)
@@ -80,6 +82,7 @@
 <!--
   ACTION REQUIRED: The content in this section represents placeholders.
   Fill them out with the right functional requirements.
+  Align with project standards: Python 3.12+, type hints everywhere, dataclasses for structured data, pytest for testing (TDD), and coverage ≥80%.
 -->
 
 ### Functional Requirements
@@ -105,6 +108,7 @@
 <!--
   ACTION REQUIRED: Define measurable success criteria.
   These must be technology-agnostic and measurable.
+  Include verification signals for TDD (tests written first), type correctness, and maintaining ≥80% coverage alongside feature-specific outcomes.
 -->
 
 ### Measurable Outcomes
