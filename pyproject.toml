@@ -1,0 +1,13 @@
+[project]
+name = "piaic71-hackathon-v2"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
+    "questionary>=2.1.1",
+    "rich>=14.2.0",
+    "typer>=0.20.0",
+]
