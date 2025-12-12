@@ -103,3 +103,19 @@ Technical details:
 - Use Python 3.12+ type hints with | union syntax
 - Follow TDD: write tests first, then implementation
 - Organize code and tests according to your constitution rules
+
+/sp.tasks
+
+Break plan into small tasks (T001..), each ≤ 3 minutes, testable, reversible.
+Add dependencies between tasks; group into phases; mark deliverables per task. Group tasks by operations and for each operation like add use TDD approach so RED Tests, Green Tests and Refactor. After each group we pause for human review and on approval commit to github.
+
+Focus on:
+- TDD approach (tests first for each operation)
+- Small, step-by-step implementation
+- Clear task dependencies
+- Easy to undo changes
+
+/sp implement
+
+Rules: tests first, smallest diff, keep public API stable within a phase.
+After each task: run tests, update checklist, note deltas to spec if needed Mark completed tasks in tasks.md
