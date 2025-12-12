@@ -1,5 +1,10 @@
-def main():
-    print("Hello from piaic71-hackathon-v2!")
+from __future__ import annotations
+
+from src.main import entrypoint
+
+
+def main() -> None:
+    entrypoint()
 
 
 if __name__ == "__main__":
