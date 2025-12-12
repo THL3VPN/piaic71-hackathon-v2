@@ -17,3 +17,89 @@ Quality requirements:
 - At least 80% code coverage
 - Use dataclasses for data structures
 
+Use the agent to commit and open a PR for the constitution: /sp.git.commit_pr Commit and push the constitution along with current work.
+
+Review the constitution and suggest any modifications based on my preferences:
+- I want comprehensive type hints everywhere
+- I want detailed docstrings for all public functions
+- I want error handling to be explicit, not silent
+- I want to use dataclasses for data structures
+- I want to follow SOLID principles
+- Focus on learning and teaching value
+
+
+/sp.specify
+
+Feature: Basic calculator operations with full testing.
+User journeys:
+- Add two numbers (positive, negative, zero, decimals)
+- Subtract two numbers (all combinations)
+- Multiply two numbers (including edge cases)
+- Divide two numbers (we'll handle division by zero later)
+
+Acceptance criteria:
+- All operations work with whole numbers and decimals
+- All operations return correct results
+- All operations have full test coverage
+- All functions use Python 3.12+ type hints
+- All functions have clear docstrings
+
+Success metrics:
+- 100% test coverage for all operations
+- Type checking passes with mypy
+- Code follows our constitution rules
+
+**Specify Prompt (Todo CLI App – Single File Entry, Interactive Menu, In-Memory)**
+
+/specify 
+
+Feature: Interactive command-line todo **app** (not one-command-per-action) that runs from a single entry file (`main.py`) and stores tasks in memory, with full testing.
+
+User journeys:
+
+* Run the app with `python main.py`
+* See a clear main menu with all options visible:
+
+  * View tasks
+  * Add task
+  * Update task
+  * Delete task
+  * Mark complete/incomplete
+  * Exit
+* Choose an option via an interactive selector (keyboard-friendly)
+* Complete the flow and return to the main menu until Exit
+
+Acceptance criteria:
+
+* The user runs **one file**: `main.py` (this starts the app)
+* The app shows an always-available **interactive main menu** (no “one CLI command per feature” design)
+* Tasks are stored **in memory only** (no files, no DB)
+* Each task is uniquely addressable (ID or index) for update/delete/toggle
+* Add validates required fields (non-empty title)
+* View shows tasks clearly (ID/index, title, status; formatted nicely)
+* Update/Delete/Toggle handle “task not found” gracefully and keep the app running
+* After each action, the app returns to the menu (unless Exit chosen)
+* Implementation uses:
+
+  * **Questionary** for menu + prompts
+  * **Rich** for tables/panels/messages
+  * **Typer** only as the minimal entry wrapper to launch the app (not per-action commands)
+* Full test coverage for core logic with pytest (UI layer can be lightly tested or separated)
+
+Success metrics:
+
+* ≥80% overall test coverage (100% for core task operations)
+* All tests pass
+* Code follows our constitution rules (dataclasses for data structures, Python 3.12+ type hints, clear docstrings)
+
+/plan
+
+Create: architecture sketch, interfaces, data model, error handling, requirements.
+Decisions needing: list important choices with options and tradeoffs.
+Testing strategy: unit + integration tests based on acceptance criteria.
+
+Technical details:
+- Use a simple, functional approach where it makes sense
+- Use Python 3.12+ type hints with | union syntax
+- Follow TDD: write tests first, then implementation
+- Organize code and tests according to your constitution rules
