@@ -34,3 +34,8 @@ Technical details:
 - Follow TDD: write tests first, then implementation
 - Organize code and tests according to your constitution rules
 
+
+to test
+
+export UV_PYTHON=python3.13
+UV_PYTHON=python3.13 uv run uvicorn src.main:app --reload --port 8000
