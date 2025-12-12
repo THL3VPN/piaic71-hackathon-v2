@@ -167,3 +167,10 @@ Before every session, agents should re-read:
 
 This ensures predictable, deterministic development.
 ```
+
+## Active Technologies
+- Python 3.12+ (required) + UV-managed Python packages: typer (entry wrapper), questionary (interactive menus), rich (tables/messages), pytest (tests) (001-interactive-todo-cli)
+- In-memory only (no filesystem, no DB) (001-interactive-todo-cli)
+
+## Recent Changes
+- 001-interactive-todo-cli: Added Python 3.12+ (required) + UV-managed Python packages: typer (entry wrapper), questionary (interactive menus), rich (tables/messages), pytest (tests)
