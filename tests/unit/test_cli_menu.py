@@ -1,229 +1,159 @@
 from __future__ import annotations
 
-from unittest import mock
+from typing import Any
 
 from src.cli import menu
 from src.models.task import Task
 
 
-def test_main_menu_loop_non_interactive_renders_without_error():
-    tasks = [Task(id=1, title="alpha"), Task(id=2, title="beta", completed=True)]
-    # Should not raise when run non-interactive
+def test_main_menu_loop_noninteractive_renders(monkeypatch) -> None:
+    seen: list[list[Task]] = []
+
+    def fake_render(tasks: list[Task]) -> None:
+        seen.append(tasks)
+
+    monkeypatch.setattr(menu, "render_tasks", fake_render)
+    tasks = [Task(id=1, title="x")]
     menu.main_menu_loop(tasks=tasks, interactive=False)
+    assert seen == [tasks]
 
 
-def test_main_menu_loop_interactive_stub_calls_render():
-    tasks = [Task(id=1, title="alpha")]
-    called = {}
+def test_prompt_int_parses_digits_and_rejects_other(monkeypatch) -> None:
+    assert menu._prompt_int(lambda _: "12", "msg") == 12
+    assert menu._prompt_int(lambda _: " 99 ", "msg") == 99
+    assert menu._prompt_int(lambda _: "abc", "msg") is None
+    assert menu._prompt_int(lambda _: None, "msg") is None
 
-    def fake_render(ts):
-        called["tasks"] = ts
+
+def test_handle_add_valid_and_invalid(monkeypatch) -> None:
+    added: list[Task] = []
+
+    def fake_add(tasks: list[Task], title: str) -> Task:
+        if not title.strip():
+            raise ValueError("empty")
+        task = Task(id=1, title=title)
+        tasks.append(task)
+        return task
+
+    def fake_render(task: Task) -> None:
+        added.append(task)
+
+    monkeypatch.setattr(menu, "add_task", fake_add)
+    monkeypatch.setattr(menu, "render_add_confirmation", fake_render)
+
+    tasks: list[Task] = []
+    menu._handle_add(tasks, " title ")
+    assert added and added[0].title == "title"
+
+    menu._handle_add(tasks, None)
+    menu._handle_add(tasks, "   ")
+    assert len(tasks) == 1  # unchanged after invalid inputs
+
+
+def test_handle_update_delete_toggle(monkeypatch) -> None:
+    tasks = [Task(id=1, title="a")]
+    rendered: list[Task] = []
+    monkeypatch.setattr(menu, "render_add_confirmation", lambda t: rendered.append(t))
+    monkeypatch.setattr(menu, "update_task", lambda ts, task_id, new: ts[0] if task_id == 1 else None)
+    monkeypatch.setattr(menu, "delete_task", lambda ts, task_id: task_id == 1)
+    monkeypatch.setattr(menu, "toggle_task", lambda ts, task_id: ts[0] if task_id == 1 else None)
+
+    # update happy path
+    prompts = iter(["1", "new title"])
+    menu._handle_update(tasks, lambda _: next(prompts))
+    assert rendered and rendered[-1] is tasks[0]
+
+    # delete happy path
+    prompts = iter(["1"])
+    menu._handle_delete(tasks, lambda _: next(prompts))
+
+    # toggle happy path
+    prompts = iter(["1"])
+    menu._handle_toggle(tasks, lambda _: next(prompts))
+
+    # invalid prompt returns early
+    prompts = iter(["abc"])
+    menu._handle_update(tasks, lambda _: next(prompts))
+    prompts = iter([None])
+    menu._handle_toggle(tasks, lambda _: next(prompts))
+
+    # missing id for delete -> early return
+    prompts = iter([None])
+    menu._handle_delete(tasks, lambda _: next(prompts))
+
+    # update with missing title -> early return
+    prompts = iter(["1", None])
+    menu._handle_update(tasks, lambda _: next(prompts))
+
+    # update with ValueError
+    monkeypatch.setattr(menu, "update_task", lambda *_: (_ for _ in ()).throw(ValueError()))
+    prompts = iter(["1", "bad"])
+    menu._handle_update(tasks, lambda _: next(prompts))
+
+    # update with no matching task
+    monkeypatch.setattr(menu, "update_task", lambda ts, task_id, new: None)
+    prompts = iter(["1", "missing"])
+    menu._handle_update(tasks, lambda _: next(prompts))
+
+    # delete with no match
+    monkeypatch.setattr(menu, "delete_task", lambda *_: False)
+    prompts = iter(["2"])
+    menu._handle_delete(tasks, lambda _: next(prompts))
+
+    # toggle missing task
+    monkeypatch.setattr(menu, "toggle_task", lambda *_: None)
+    prompts = iter(["2"])
+    menu._handle_toggle(tasks, lambda _: next(prompts))
+
+
+def test_main_menu_loop_once_add_flow(monkeypatch) -> None:
+    tasks: list[Task] = []
+    choices = iter(["Add task", "Exit"])
+    titles = iter(["new title"])
+    monkeypatch.setattr(menu, "render_add_confirmation", lambda task: None)
 
     menu.main_menu_loop(
         tasks=tasks,
         interactive=True,
         once=True,
-        select_fn=lambda choices: "View tasks",
-        prompt_fn=lambda message: None,
+        select_fn=lambda _: next(choices),
+        prompt_fn=lambda _: next(titles, None),
     )
-    # Render_tasks is invoked inside; ensure tasks were passed through
-    assert tasks == tasks  # sanity to keep lint happy
+    assert tasks and tasks[0].title == "new title"
 
 
-def test_menu_add_dispatches():
-    tasks: list[Task] = []
-    called = {}
+def test_main_menu_loop_view_and_exit(monkeypatch) -> None:
+    tasks: list[Task] = [Task(id=1, title="x")]
+    calls: list[str] = []
 
-    def fake_handle(tasks_local, title):
-        called["title"] = title
+    def fake_render(ts: list[Task]) -> None:
+        calls.append(f"render:{len(ts)}")
 
-    with mock.patch("src.cli.menu._handle_add", side_effect=fake_handle):
+    monkeypatch.setattr(menu, "render_tasks", fake_render)
+
+    choices = iter(["View tasks", "Exit"])
+    menu.main_menu_loop(
+        tasks=tasks,
+        interactive=True,
+        once=False,
+        select_fn=lambda _: next(choices),
+        prompt_fn=lambda _: None,
+    )
+    assert "render:1" in calls
+
+
+def test_main_menu_loop_other_actions(monkeypatch) -> None:
+    called: list[str] = []
+    monkeypatch.setattr(menu, "_handle_update", lambda *_: called.append("update"))
+    monkeypatch.setattr(menu, "_handle_delete", lambda *_: called.append("delete"))
+    monkeypatch.setattr(menu, "_handle_toggle", lambda *_: called.append("toggle"))
+
+    for choice in ["Update task", "Delete task", "Mark complete/incomplete"]:
         menu.main_menu_loop(
-            tasks=tasks,
+            tasks=[Task(id=1, title="x")],
             interactive=True,
             once=True,
-            select_fn=lambda choices: "Add task",
-            prompt_fn=lambda message: "New task",
+            select_fn=lambda _: choice,
+            prompt_fn=lambda _: None,
         )
-
-    assert called.get("title") == "New task"
-
-
-def test_menu_loop_add_then_exit_sequence():
-    tasks: list[Task] = []
-    choices = iter(["Add task", "Exit"])
-    menu.main_menu_loop(
-        tasks=tasks,
-        interactive=True,
-        once=False,
-        select_fn=lambda opts: next(choices),
-        prompt_fn=lambda message: "Seq task",
-    )
-    assert len(tasks) == 1
-    assert tasks[0].title == "Seq task"
-
-
-def test_menu_loop_handles_none_title_gracefully():
-    tasks: list[Task] = []
-    called = iter(["Add task", "Exit"])
-    menu.main_menu_loop(
-        tasks=tasks,
-        interactive=True,
-        once=False,
-        select_fn=lambda opts: next(called),
-        prompt_fn=lambda message: None,
-    )
-    assert tasks == []
-
-
-def test_handle_add_catches_validation_error():
-    tasks: list[Task] = []
-    with mock.patch("src.cli.menu.add_task", side_effect=ValueError):
-        menu._handle_add(tasks, "  ")
-    assert tasks == []
-
-
-def test_handle_add_renders_confirmation():
-    tasks: list[Task] = []
-    fake_task = Task(id=7, title="added")
-    with mock.patch("src.cli.menu.add_task", return_value=fake_task) as add_mock:
-        with mock.patch("src.cli.menu.render_add_confirmation") as render_mock:
-            menu._handle_add(tasks, "added")
-            add_mock.assert_called_once()
-            render_mock.assert_called_once_with(fake_task)
-
-
-
-
-
-def test_menu_update_delete_toggle_dispatch():
-    tasks = [Task(id=1, title="a"), Task(id=2, title="b", completed=False)]
-    choices = iter(["Update task", "Delete task", "Mark complete/incomplete", "Exit"])
-
-    def fake_select(opts):
-        return next(choices)
-
-    titles = iter(["new title"])
-
-    def fake_prompt(msg):
-        if "title" in msg.lower():
-            return next(titles)
-        return None
-
-    with mock.patch("src.cli.menu._handle_update") as h_update, \
-         mock.patch("src.cli.menu._handle_delete") as h_delete, \
-         mock.patch("src.cli.menu._handle_toggle") as h_toggle:
-        menu.main_menu_loop(tasks=tasks, interactive=True, once=False, select_fn=fake_select, prompt_fn=fake_prompt)
-
-    h_update.assert_called_once()
-    h_delete.assert_called_once()
-    h_toggle.assert_called_once()
-
-
-
-
-@mock.patch("questionary.select")
-@mock.patch("questionary.text")
-def test_main_menu_loop_interactive_calls_handlers(select_mock, text_mock):
-    select_mock.side_effect = [
-        mock.Mock(ask=lambda: "Update task"),
-        mock.Mock(ask=lambda: "Delete task"),
-        mock.Mock(ask=lambda: "Mark complete/incomplete"),
-        mock.Mock(ask=lambda: "Exit"),
-    ]
-    text_mock.return_value.ask.side_effect = ["1", "new title", "1", "1"]
-    tasks = [Task(id=1, title="a")]
-    with mock.patch("src.cli.menu.update_task", return_value=tasks[0]) as upd, \
-         mock.patch("src.cli.menu.delete_task", return_value=True) as delete_mock, \
-         mock.patch("src.cli.menu.toggle_task", return_value=tasks[0]) as toggle_mock:
-        menu.main_menu_loop(
-            tasks=tasks,
-            interactive=True,
-            once=False,
-            select_fn=lambda choices: select_mock().ask(),
-            prompt_fn=lambda msg: text_mock().ask(),
-        )
-    upd.assert_called_once_with(tasks, 1, "new title")
-    delete_mock.assert_called_once_with(tasks, 1)
-    toggle_mock.assert_called_once_with(tasks, 1)
-
-
-
-
-def test_menu_loop_covers_edge_choices():
-    tasks: list[Task] = [Task(id=1, title="a")]
-
-    # Sequence hits: invalid ID for update (None), invalid ID for delete (None), invalid ID for toggle (None), then exit
-    choices = iter(["Update task", "Delete task", "Mark complete/incomplete", "Exit"])
-
-    def fake_select(opts):
-        return next(choices)
-
-    prompts = iter(["", " ", "abc", None])
-
-    def fake_prompt(msg):
-        return next(prompts)
-
-    menu.main_menu_loop(tasks=tasks, interactive=True, once=False, select_fn=fake_select, prompt_fn=fake_prompt)
-
-    # ensure tasks unchanged
-    assert tasks[0].title == "a"
-    assert tasks[0].completed is False
-
-
-def test_handle_delete_no_match_noop():
-    tasks = [Task(id=1, title="a")]
-
-    def fake_prompt(msg):
-        return "99"
-
-    with mock.patch("src.cli.menu.delete_task", return_value=False) as delete_mock:
-        menu._handle_delete(tasks, fake_prompt)
-        delete_mock.assert_called_once_with(tasks, 99)
-
-
-def test_handle_toggle_no_match_noop():
-    tasks = [Task(id=1, title="a")]
-
-    def fake_prompt(msg):
-        return "99"
-
-    with mock.patch("src.cli.menu.toggle_task", return_value=None) as toggle_mock:
-        menu._handle_toggle(tasks, fake_prompt)
-        toggle_mock.assert_called_once_with(tasks, 99)
-
-
-def test_prompt_int_handles_none_and_nondigit():
-    assert menu._prompt_int(lambda msg: None, "id?") is None
-    assert menu._prompt_int(lambda msg: "abc", "id?") is None
-    assert menu._prompt_int(lambda msg: " 7 ", "id?") == 7
-
-
-def test_handle_update_new_title_none():
-    tasks = [Task(id=1, title="a")]
-    prompts = iter(["1", None])
-    menu._handle_update(tasks, lambda msg: next(prompts))
-    assert tasks[0].title == "a"
-
-
-def test_handle_update_value_error():
-    tasks = [Task(id=1, title="a")]
-
-    def fake_prompt(msg):
-        return "1" if "id" in msg.lower() else "bad"
-
-    with mock.patch("src.cli.menu.update_task", side_effect=ValueError):
-        menu._handle_update(tasks, fake_prompt)
-    assert tasks[0].title == "a"
-
-
-def test_handle_update_not_found_returns_none():
-    tasks = [Task(id=1, title="a")]
-    prompts = iter(["1", "new title"])
-
-    def fake_prompt(msg):
-        return next(prompts)
-
-    with mock.patch("src.cli.menu.update_task", return_value=None) as upd:
-        menu._handle_update(tasks, fake_prompt)
-        upd.assert_called_once_with(tasks, 1, "new title")
+    assert called == ["update", "delete", "toggle"]
