@@ -173,6 +173,8 @@ This ensures predictable, deterministic development.
 - In-memory only (no filesystem, no DB) (001-interactive-todo-cli)
 - Python 3.13+ (constitution requires 3.12+, using 3.13) + FastAPI, uvicorn, pytest (with pytest-cov) (001-fastapi-health)
 - N/A (no database) (001-fastapi-health)
+- Python 3.13 (constitution requires 3.12+, using 3.13) + UV-managed: fastapi, sqlmodel, uvicorn, httpx (tests), pytest/pytest-cov; database driver via SQLModel (psycopg recommended) (003-sqlmodel-neon-tasks)
+- Neon Serverless PostgreSQL via `DATABASE_URL` env var (003-sqlmodel-neon-tasks)
 
 ## Recent Changes
 - 001-interactive-todo-cli: Added Python 3.12+ (required) + UV-managed Python packages: typer (entry wrapper), questionary (interactive menus), rich (tables/messages), pytest (tests)

@@ -35,6 +35,7 @@ Technical details:
 - Organize code and tests according to your constitution rules
 
 
+
 to test
 
 export UV_PYTHON=python3.13
