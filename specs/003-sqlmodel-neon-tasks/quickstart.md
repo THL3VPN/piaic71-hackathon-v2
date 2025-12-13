@@ -28,6 +28,8 @@ UV_PYTHON=python3.13 UV_CACHE_DIR=.uv-cache uv run uvicorn src.main:app --reload
 UV_PYTHON=python3.13 UV_CACHE_DIR=.uv-cache uv run pytest --cov=src --cov-report=term-missing
 ```
 
+With Neon connectivity (set `DATABASE_URL` and `RUN_DB_TESTS=1`), rerun the same command to include the database-heavy suites that otherwise skip in the default environment.
+
 For integration tests hitting Neon: ensure `RUN_DB_TESTS=1` plus your `DATABASE_URL` are exported before running pytest. Without them the DB-heavy tests are skipped to avoid sqlite deadlocks.
 
 ## Expected behaviors
