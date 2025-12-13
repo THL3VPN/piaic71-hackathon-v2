@@ -175,6 +175,8 @@ This ensures predictable, deterministic development.
 - N/A (no database) (001-fastapi-health)
 - Python 3.13 (constitution requires 3.12+, using 3.13) + UV-managed: fastapi, sqlmodel, uvicorn, httpx (tests), pytest/pytest-cov; database driver via SQLModel (psycopg recommended) (003-sqlmodel-neon-tasks)
 - Neon Serverless PostgreSQL via `DATABASE_URL` env var (003-sqlmodel-neon-tasks)
+- Python 3.13 (UV-managed interpreter) with strict type hints. + `fastapi`, `uvicorn`, `sqlmodel`, `psycopg`, `questionary`/`rich` remain in place per constitution; new routes will rely on existing service modules. (004-backend-tasks-external-apis)
+- Neon Serverless PostgreSQL (configured via `DATABASE_URL` and shared engine/session helpers). (004-backend-tasks-external-apis)
 
 ## Recent Changes
 - 001-interactive-todo-cli: Added Python 3.12+ (required) + UV-managed Python packages: typer (entry wrapper), questionary (interactive menus), rich (tables/messages), pytest (tests)
