@@ -1,0 +1,35 @@
+openapi: 3.0.3
+info:
+  title: Health API
+  version: 1.0.0
+paths:
+  /health:
+    get:
+      summary: Backend health check
+      description: Returns the current status so the frontend can display it.
+      responses:
+        '200':
+          description: Backend healthy response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                required:
+                  - status
+        '500':
+          description: Backend error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: unavailable
+                  message:
+                    type: string
+                    example: Database down
