@@ -4,6 +4,7 @@ import logging
 import os
 from typing import Any, Optional
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.api import health as health_router
@@ -14,6 +15,13 @@ from src.services import db
 _engine: Optional[AsyncEngine] = None
 
 app = FastAPI()
+frontend_origin = os.getenv("NEXT_PUBLIC_API_BASE_URL") or "http://localhost:3000"
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[frontend_origin, "http://localhost:3000"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.include_router(health_router.router)
 app.include_router(tasks_router.router, prefix="/api")
 
