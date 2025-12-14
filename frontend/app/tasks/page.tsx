@@ -1,142 +1,200 @@
 "use client";
 
-import { fetchTasks, submitTask, validateTaskPayload } from "../../lib/tasks";
+import {
+  deleteTask,
+  fetchTasks,
+  submitTask,
+  TaskPayload,
+  toggleTaskCompletion,
+  updateTask,
+  validateTaskPayload,
+} from "../../lib/tasks";
 import { Task } from "../../lib/types";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
-const statusClasses = {
-  true: "text-emerald-500",
-  false: "text-orange-500"
-};
+const tabs = [
+  { id: "view", label: "View tasks" },
+  { id: "add", label: "Add task" },
+];
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState({ title: "", description: "" });
+  const [activeTab, setActiveTab] = useState(tabs[0].id);
+  const [formData, setFormData] = useState<TaskPayload>({ title: "", description: "" });
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
 
   useEffect(() => {
-    fetchTasks()
-      .then((data) => setTasks(data))
-      .catch((err) => setError(err instanceof Error ? err.message : "Failed to load tasks"))
-      .finally(() => setLoading(false));
+    refresh();
   }, []);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  async function refresh() {
+    setLoading(true);
+    try {
+      const data = await fetchTasks();
+      setTasks(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load tasks");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
-    const validationMessage = validateTaskPayload({
-      title: formData.title,
-      description: formData.description,
-    });
-
+    const validationMessage = validateTaskPayload(formData);
     if (validationMessage) {
       setFormError(validationMessage);
       return;
     }
-
     setFormError(null);
     setSubmitting(true);
-
     try {
-      const created = await submitTask(
-        {
-          title: formData.title,
-          description: formData.description,
-        },
-        { retry: true }
-      );
-      setTasks((previous) => [created, ...previous]);
+      if (editingTaskId != null) {
+        const updated = await updateTask(editingTaskId, formData);
+        setTasks((prev) => prev.map((task) => (task.id === updated.id ? updated : task)));
+      } else {
+        const created = await submitTask(formData);
+        setTasks((prev) => [created, ...prev]);
+      }
       setFormData({ title: "", description: "" });
+      setEditingTaskId(null);
+      setActiveTab("view");
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : "Failed to create task");
+      setFormError(err instanceof Error ? err.message : "Failed to save task");
     } finally {
       setSubmitting(false);
     }
-  };
+  }
+
+  const filteredTasks = useMemo(() => tasks, [tasks]);
 
   return (
-    <main className="min-h-screen bg-slate-950 p-6 text-white">
-      <section className="mx-auto max-w-5xl space-y-6 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl">
-        <header className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+    <main className="page-shell">
+      <section className="page-card">
+        <header className="page-header">
           <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Tasks</p>
-            <h1 className="text-4xl font-semibold">Team backlog</h1>
+            <p className="page-header-subtitle">Task operations</p>
+            <h1 className="page-header-title">Team backlog</h1>
           </div>
-          <span className="text-sm text-slate-300">
-            {loading ? "Loading…" : `${tasks.length} task${tasks.length === 1 ? "" : "s"}`}
-          </span>
+          <div className="page-count-wrapper">
+            <span className="page-count">{loading ? "Loading…" : `${tasks.length} tasks`}</span>
+            <span className="page-count-secondary">Updated moments ago</span>
+          </div>
         </header>
 
         {error && (
-          <div
-            role="alert"
-            aria-live="assertive"
-            className="rounded-2xl border border-red-400/60 bg-red-500/10 p-4 text-sm text-red-200"
-          >
+          <div role="alert" aria-live="assertive" className="alert">
             Backend unavailable — {error}
           </div>
         )}
 
-        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {tasks.map((task) => (
-            <article
-              key={task.id}
-              className="rounded-2xl border border-white/10 bg-slate-900/60 p-5 backdrop-blur"
+        <div className="tab-row">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              className={`tab ${activeTab === tab.id ? "tab-active" : "tab-inactive"}`}
+              onClick={() => setActiveTab(tab.id)}
             >
-              <div className="flex items-center justify-between">
-                <p className="text-2xl font-bold tracking-tight">{task.title}</p>
-                <span className={statusClasses[task.completed]}>{task.completed ? "Done" : "Pending"}</span>
-              </div>
-              {task.description && (
-                <p className="mt-3 text-sm text-slate-300">{task.description}</p>
-              )}
-            </article>
+              {tab.label}
+            </button>
           ))}
         </div>
 
-        {!loading && tasks.length === 0 && !error && (
-          <p className="rounded-2xl border border-dashed border-slate-600/60 p-4 text-center text-slate-400">
-            No tasks yet. Create one to get started.
-          </p>
+        {activeTab === "view" && (
+          <div className="page-grid">
+            {filteredTasks.map((task) => (
+              <article key={task.id} className="task-card">
+                <div className="task-card-header">
+                  <p className="task-card-title">{task.title}</p>
+                  <span className={`task-status ${task.completed ? "task-status-done" : "task-status-pending"}`}>
+                    {task.completed ? "Done" : "Pending"}
+                  </span>
+                </div>
+                {task.description && <p className="task-card-description">{task.description}</p>}
+                <div className="card-actions">
+                  <button
+                    type="button"
+                    className="action-button"
+                    onClick={() =>
+                      toggleTaskCompletion(task.id).then((updated) =>
+                        setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)))
+                      )
+                    }
+                  >
+                    {task.completed ? "Mark Pending" : "Mark Done"}
+                  </button>
+                  <button
+                    type="button"
+                    className="action-button-ghost"
+                    onClick={() => {
+                      setEditingTaskId(task.id);
+                      setFormData({ title: task.title, description: task.description ?? "" });
+                      setActiveTab("add");
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    className="action-button-danger"
+                    onClick={() => deleteTask(task.id).then(() => setTasks((prev) => prev.filter((t) => t.id !== task.id)))}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
         )}
-        <form className="space-y-4 rounded-2xl border border-white/10 bg-slate-950/30 p-6" onSubmit={handleSubmit}>
-          <div className="space-y-1">
-            <label className="text-sm font-semibold text-slate-200" htmlFor="title">
-              Title
-            </label>
-            <input
-              id="title"
-              value={formData.title}
-              onChange={(event) => setFormData((prev) => ({ ...prev, title: event.target.value }))}
-              className="w-full rounded-2xl border border-white/20 bg-slate-900/80 p-3 text-white placeholder:text-slate-500 focus:border-emerald-400 focus:outline-none"
-              placeholder="Describe the task"
-            />
-          </div>
-          <div className="space-y-1">
-            <label className="text-sm font-semibold text-slate-200" htmlFor="description">
-              Description (optional)
-            </label>
-            <textarea
-              id="description"
-              value={formData.description}
-              onChange={(event) => setFormData((prev) => ({ ...prev, description: event.target.value }))}
-              className="w-full rounded-2xl border border-white/20 bg-slate-900/80 p-3 text-white placeholder:text-slate-500 focus:border-emerald-400 focus:outline-none"
-              placeholder="Add context or acceptance criteria"
-              rows={3}
-            />
-          </div>
-          {formError && <p className="text-sm text-red-300">{formError}</p>}
-          <button
-            type="submit"
-            disabled={submitting}
-            className="rounded-2xl bg-emerald-500 px-6 py-3 font-semibold text-slate-900 transition hover:bg-emerald-400 disabled:opacity-60"
-          >
-            {submitting ? "Adding…" : "Add task"}
-          </button>
-        </form>
+
+        {activeTab === "add" && (
+          <form className="form" onSubmit={handleSubmit}>
+            <div>
+              <label className="form-label" htmlFor="title">
+                Title
+              </label>
+              <input
+                id="title"
+                value={formData.title}
+                onChange={(event) => setFormData((prev) => ({ ...prev, title: event.target.value }))}
+                className="form-input"
+                placeholder="Describe the task"
+              />
+            </div>
+            <div>
+              <label className="form-label" htmlFor="description">
+                Description (optional)
+              </label>
+              <textarea
+                id="description"
+                value={formData.description}
+                onChange={(event) => setFormData((prev) => ({ ...prev, description: event.target.value }))}
+                className="form-input"
+                placeholder="Add context or acceptance criteria"
+                rows={3}
+              />
+            </div>
+            {formError && <p className="form-error">{formError}</p>}
+            <button type="submit" disabled={submitting} className="form-button">
+              {submitting ? "Saving…" : editingTaskId ? "Update task" : "Add task"}
+            </button>
+            <button
+              type="button"
+              className="form-button-secondary"
+              onClick={() => {
+                setEditingTaskId(null);
+                setFormData({ title: "", description: "" });
+              }}
+            >
+              Reset
+            </button>
+          </form>
+        )}
       </section>
     </main>
   );

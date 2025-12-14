@@ -21,7 +21,7 @@ async function parsedResponse<T>(res: Response): Promise<T> {
 export async function fetchTasks(): Promise<Task[]> {
   const res = await fetch(BASE_URL, {
     headers: { Accept: "application/json" },
-    cache: "no-store"
+    cache: "no-store",
   });
 
   return parsedResponse(res);
@@ -32,7 +32,7 @@ export async function submitTask(payload: TaskPayload, options?: { retry?: boole
     const res = await fetch(BASE_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parsedResponse<Task>(res);
   };
@@ -45,4 +45,30 @@ export async function submitTask(payload: TaskPayload, options?: { retry?: boole
     }
     throw err;
   }
+}
+
+export async function updateTask(id: number, payload: TaskPayload): Promise<Task> {
+  const res = await fetch(`${BASE_URL}/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify(payload),
+  });
+  return parsedResponse<Task>(res);
+}
+
+export async function deleteTask(id: number): Promise<void> {
+  const res = await fetch(`${BASE_URL}/${id}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to delete task: ${res.status} ${res.statusText}`);
+  }
+}
+
+export async function toggleTaskCompletion(id: number): Promise<Task> {
+  const res = await fetch(`${BASE_URL}/${id}/complete`, {
+    method: "PATCH",
+    headers: { Accept: "application/json" },
+  });
+  return parsedResponse<Task>(res);
 }

@@ -18,7 +18,7 @@ describe("TasksPage", () => {
 
     render(<TasksPage />);
 
-    expect(fetch).toHaveBeenCalledWith("/api/tasks", expect.any(Object));
+    expect(fetch).toHaveBeenCalledWith("http://localhost:8000/api/tasks", expect.any(Object));
     expect(await screen.findByText("Sample task")).toBeInTheDocument();
     expect(screen.getByText("Team backlog")).toBeInTheDocument();
   });
@@ -46,7 +46,7 @@ describe("TasksPage", () => {
     fireEvent.click(screen.getByRole("button", { name: /Add task/i }));
 
     expect(fetchMock).toHaveBeenCalledWith(
-      "/api/tasks",
+      "http://localhost:8000/api/tasks",
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({ title: "New task", description: "Fresh" }),
@@ -62,6 +62,6 @@ describe("TasksPage", () => {
     render(<TasksPage />);
 
     expect(await screen.findByRole("alert")).toHaveTextContent(/Backend unavailable/i);
-    expect(document.querySelector(".grid")).toBeInTheDocument();
+    expect(document.querySelector(".page-grid")).toBeInTheDocument();
   });
 });
