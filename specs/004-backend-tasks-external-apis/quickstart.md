@@ -3,6 +3,7 @@
 ## Architecture
 
 - FastAPI app in `src/main.py` mounts a router from `src/api/tasks.py`.
+- The router is mounted at `/api/tasks` so clients can reach the CRUD endpoints without touching the CLI entrypoints.
 - Routes are thin adapters that fetch the shared SQLModel session, call `src/services/task_repo.py`, and return HTTP responses.
 - SQLModel uses the Neon PostgreSQL engine configured via `DATABASE_URL`.
 

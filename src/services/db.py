@@ -1,12 +1,20 @@
 from __future__ import annotations
 
 import os
-from contextlib import asynccontextmanager
-from typing import AsyncIterator, Mapping
+from typing import AsyncIterator, Mapping, Optional
 
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlalchemy.pool import StaticPool
 from sqlmodel import SQLModel
+
+
+_engine: Optional[AsyncEngine] = None
+
+
+def get_engine_instance() -> AsyncEngine:
+    if _engine is None:
+        raise RuntimeError("Database engine has not been initialized")
+    return _engine
 
 
 def get_engine(database_url: str) -> AsyncEngine:
@@ -25,12 +33,30 @@ def get_engine(database_url: str) -> AsyncEngine:
     )
 
 
-@asynccontextmanager
-async def get_session(engine: AsyncEngine) -> AsyncIterator[AsyncSession]:
-    """Yield an AsyncSession bound to the provided engine."""
-    session_maker = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-    async with session_maker() as session:
+class SessionContext:
+    def __init__(self, engine: AsyncEngine) -> None:
+        self._engine = engine
+        self._session: AsyncSession | None = None
+
+    async def __aenter__(self) -> AsyncSession:
+        self._session = AsyncSession(self._engine, expire_on_commit=False)
+        return self._session
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
+        if self._session is not None:
+            await self._session.close()
+
+
+async def get_session() -> AsyncIterator[AsyncSession]:
+    """Yield an AsyncSession bound to the configured engine (FastAPI dependency)."""
+    engine = get_engine_instance()
+    async with SessionContext(engine) as session:
         yield session
+
+
+def get_session_for_engine(engine: AsyncEngine) -> SessionContext:
+    """Return a session context manager bound to the provided test engine."""
+    return SessionContext(engine)
 
 
 async def create_all(engine: AsyncEngine) -> None:
@@ -53,4 +79,14 @@ async def init_engine_from_env(env: Mapping[str, str] | None = None) -> AsyncEng
     url = get_database_url(env)
     engine = get_engine(url)
     await create_all(engine)
+    global _engine
+    _engine = engine
     return engine
+
+
+async def dispose_engine() -> None:
+    """Dispose the configured engine, if present."""
+    global _engine
+    if _engine is not None:
+        await _engine.dispose()
+        _engine = None

@@ -26,7 +26,7 @@ async def engine(tmp_path) -> AsyncEngine:
         await db.create_all(engine)
     except (SQLAlchemyError, asyncio.CancelledError, asyncio.TimeoutError) as exc:
         pytest.skip(f"Skipping DB tests due to connection issue: {exc}")
-    async with db.get_session(engine) as session:
+    async with db.get_session_for_engine(engine) as session:
         await session.execute(delete(Task))
         await session.commit()
     try:
@@ -37,7 +37,7 @@ async def engine(tmp_path) -> AsyncEngine:
 
 @pytest.fixture
 async def session(engine: AsyncEngine) -> AsyncSession:
-    async with db.get_session(engine) as session:
+    async with db.get_session_for_engine(engine) as session:
         yield session
 
 

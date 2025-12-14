@@ -27,5 +27,5 @@ async def test_get_engine_returns_async_engine(engine: AsyncEngine) -> None:
 
 @pytest.mark.anyio
 async def test_session_executes_simple_query(engine: AsyncEngine) -> None:
-    async with db.get_session(engine) as session:
+    async with db.get_session_for_engine(engine) as session:
         assert isinstance(session, AsyncSession)
