@@ -86,10 +86,10 @@
 
 ## Phase 6: Polish & Cross-Cutting
 
-- [ ] T022 Update quickstart.md with final run/test commands if changed (specs/003-sqlmodel-neon-tasks/quickstart.md) (depends on completion of user stories; deliverable: updated doc)
-- [ ] T023 Run full test suite and summarize coverage (root command: `UV_PYTHON=python3.13 UV_CACHE_DIR=.uv-cache uv run pytest --cov=src --cov-report=term-missing`) (depends on all tasks; deliverable: test report)
-- [ ] T024 Final refactor for clarity (comments/typing) in db/service modules (depends on T023; deliverable: cleaned code)
-- [ ] T025 Prepare changes for review: ensure tasks checked, git status clean (depends on T024; deliverable: ready state)
+- [X] T022 Update quickstart.md with final run/test commands if changed (specs/003-sqlmodel-neon-tasks/quickstart.md) (depends on completion of user stories; deliverable: updated doc)
+- [X] T023 Run full test suite and summarize coverage (root command: `UV_PYTHON=python3.13 UV_CACHE_DIR=.uv-cache uv run pytest --cov=src --cov-report=term-missing`) (depends on all tasks; deliverable: test report)
+- [X] T024 Final refactor for clarity (comments/typing) in db/service modules (depends on T023; deliverable: cleaned code)
+- [X] T025 Prepare changes for review: ensure tasks checked, git status clean (depends on T024; deliverable: ready state)
 
 ---
 
