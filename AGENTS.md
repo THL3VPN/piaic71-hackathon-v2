@@ -179,6 +179,8 @@ This ensures predictable, deterministic development.
 - Neon Serverless PostgreSQL (configured via `DATABASE_URL` and shared engine/session helpers). (004-backend-tasks-external-apis)
 - Frontend — JavaScript/TypeScript (Next.js 16+); Backend already running on Python 3.13 via UV + `next`, `react`, `node` (frontend); existing UV-managed backend packages remain untouched (001-frontend-health)
 - Backend health endpoint (stateless JSON), no new storage required (001-frontend-health)
+- Backend UV-managed Python 3.12+, Frontend Next.js 18.3 (App Router) with TypeScript + backend already uses UV + pytest; frontend will use Next.js + Vitest/Testing Library + ESLint flat config (005-linking-api-to-frontends)
+- PostgreSQL (Neon) provided by backend service, accessible via existing SQLModel task API (005-linking-api-to-frontends)
 
 ## Recent Changes
 - 001-interactive-todo-cli: Added Python 3.12+ (required) + UV-managed Python packages: typer (entry wrapper), questionary (interactive menus), rich (tables/messages), pytest (tests)
