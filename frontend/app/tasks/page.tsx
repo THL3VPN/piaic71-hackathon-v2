@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 
 const tabs = [
   { id: "view", label: "View tasks" },
-  { id: "add", label: "Add task" },
+  { id: "add", label: "Task form" },
 ];
 
 export default function TasksPage() {
@@ -87,16 +87,18 @@ export default function TasksPage() {
           <span className="page-count">{loading ? "Loading…" : `${tasks.length} tasks`}</span>
           <span className="page-count-secondary">Updated moments ago</span>
         </div>
-        <button
-          type="button"
-          className="form-button-secondary"
-          onClick={() => {
-            clearToken();
-            router.push("/");
-          }}
-        >
-          Logout
-        </button>
+        <div className="page-actions">
+          <button
+            type="button"
+            className="form-button-secondary"
+            onClick={() => {
+              clearToken();
+              router.push("/");
+            }}
+          >
+            Logout
+          </button>
+        </div>
       </header>
 
         {error && (
@@ -118,99 +120,96 @@ export default function TasksPage() {
           ))}
         </div>
 
-        {activeTab === "view" && (
-          <div className="page-grid">
-            {!loading && filteredTasks.length === 0 && (
-              <p className="empty-state">No tasks yet</p>
-            )}
-            {filteredTasks.map((task) => (
-              <article key={task.id} className="task-card">
-                <div className="task-card-header">
-                  <p className="task-card-title">{task.title}</p>
-                  <span className={`task-status ${task.completed ? "task-status-done" : "task-status-pending"}`}>
-                    {task.completed ? "Done" : "Pending"}
-                  </span>
-                </div>
-                {task.description && <p className="task-card-description">{task.description}</p>}
-                <div className="card-actions">
-                  <button
-                    type="button"
-                    className="action-button"
-                    onClick={() =>
-                      toggleTaskCompletion(task.id).then((updated) =>
-                        setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)))
-                      )
-                    }
-                  >
-                    {task.completed ? "Mark Pending" : "Mark Done"}
-                  </button>
-                  <button
-                    type="button"
-                    className="action-button-ghost"
-                    onClick={() => {
-                      setEditingTaskId(task.id);
-                      setFormData({ title: task.title, description: task.description ?? "" });
-                      setActiveTab("add");
-                    }}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    className="action-button-danger"
-                    onClick={() => deleteTask(task.id).then(() => setTasks((prev) => prev.filter((t) => t.id !== task.id)))}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
+        <div className="page-grid">
+          {!loading && filteredTasks.length === 0 && (
+            <p className="empty-state">No tasks yet</p>
+          )}
+          {filteredTasks.map((task) => (
+            <article key={task.id} className="task-card">
+              <div className="task-card-header">
+                <p className="task-card-title">{task.title}</p>
+                <span className={`task-status ${task.completed ? "task-status-done" : "task-status-pending"}`}>
+                  {task.completed ? "Done" : "Pending"}
+                </span>
+              </div>
+              {task.description && <p className="task-card-description">{task.description}</p>}
+              <div className="card-actions">
+                <button
+                  type="button"
+                  className="action-button"
+                  onClick={() =>
+                    toggleTaskCompletion(task.id).then((updated) =>
+                      setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)))
+                    )
+                  }
+                >
+                  {task.completed ? "Mark Pending" : "Mark Done"}
+                </button>
+                <button
+                  type="button"
+                  className="action-button-ghost"
+                  onClick={() => {
+                    setEditingTaskId(task.id);
+                    setFormData({ title: task.title, description: task.description ?? "" });
+                    setActiveTab("add");
+                  }}
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  className="action-button-danger"
+                  onClick={() => deleteTask(task.id).then(() => setTasks((prev) => prev.filter((t) => t.id !== task.id)))}
+                >
+                  Delete
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
 
-        {activeTab === "add" && (
-          <form className="form" onSubmit={handleSubmit}>
-            <div>
-              <label className="form-label" htmlFor="title">
-                Title
-              </label>
-              <input
-                id="title"
-                value={formData.title}
-                onChange={(event) => setFormData((prev) => ({ ...prev, title: event.target.value }))}
-                className="form-input"
-                placeholder="Describe the task"
-              />
-            </div>
-            <div>
-              <label className="form-label" htmlFor="description">
-                Description (optional)
-              </label>
-              <textarea
-                id="description"
-                value={formData.description}
-                onChange={(event) => setFormData((prev) => ({ ...prev, description: event.target.value }))}
-                className="form-input"
-                placeholder="Add context or acceptance criteria"
-                rows={3}
-              />
-            </div>
-            {formError && <p className="form-error">{formError}</p>}
-            <button type="submit" disabled={submitting} className="form-button">
-              {submitting ? "Saving…" : editingTaskId ? "Update task" : "Add task"}
-            </button>
-            <button
-              type="button"
-              className="form-button-secondary"
-              onClick={() => {
-                setEditingTaskId(null);
-                setFormData({ title: "", description: "" });
-              }}
-            >
-              Reset
-            </button>
-          </form>
-        )}
+        <form className="form" onSubmit={handleSubmit}>
+          <div>
+            <label className="form-label" htmlFor="title">
+              Title
+            </label>
+            <input
+              id="title"
+              value={formData.title}
+              onChange={(event) => setFormData((prev) => ({ ...prev, title: event.target.value }))}
+              className="form-input"
+              placeholder="Describe the task"
+            />
+          </div>
+          <div>
+            <label className="form-label" htmlFor="description">
+              Description (optional)
+            </label>
+            <textarea
+              id="description"
+              value={formData.description}
+              onChange={(event) => setFormData((prev) => ({ ...prev, description: event.target.value }))}
+              className="form-input"
+              placeholder="Add context or acceptance criteria"
+              rows={3}
+            />
+          </div>
+          {formError && <p className="form-error">{formError}</p>}
+          <button type="submit" disabled={submitting} className="form-button">
+            {submitting ? "Saving…" : editingTaskId ? "Update task" : "Add task"}
+          </button>
+          <button
+            type="button"
+            className="form-button-secondary"
+            onClick={() => {
+              setEditingTaskId(null);
+              setFormData({ title: "", description: "" });
+              setFormError(null);
+            }}
+          >
+            Reset
+          </button>
+        </form>
       </section>
     </main>
   );

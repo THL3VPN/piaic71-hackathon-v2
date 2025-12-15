@@ -22,6 +22,9 @@ client = TestClient(app)
 @pytest.fixture(autouse=True)
 def shared_secret(monkeypatch):
     monkeypatch.setenv("BETTER_AUTH_SECRET", SECRET)
+    # reset cached settings so middleware sees the test secret
+    import src.services.auth as auth_module
+    auth_module.get_auth_settings.cache_clear()
 
 
 def create_token(sub: str, secret: str = SECRET) -> str:
