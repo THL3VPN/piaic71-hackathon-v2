@@ -46,7 +46,7 @@ async def session(engine: AsyncEngine) -> AsyncSession:
 @pytest.mark.anyio
 async def test_create_then_get_round_trip(session: AsyncSession) -> None:
     with anyio.fail_after(5):
-        created = await task_repo.create_task(session, "integration title", "desc")
+        created = await task_repo.create_task(session, owner_id="crud-user", title="integration title", description="desc")
         fetched = await task_repo.get_task(session, created.id)  # type: ignore[arg-type]
         assert fetched is not None
         assert fetched.id == created.id

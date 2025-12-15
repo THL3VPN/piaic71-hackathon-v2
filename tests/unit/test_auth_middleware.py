@@ -5,11 +5,12 @@ import pytest
 from fastapi import FastAPI, Depends
 from fastapi.testclient import TestClient
 
-from src.services.auth import AuthenticatedContext, require_authorization
+from src.services.auth import AuthenticatedContext, AuthMiddleware, require_authorization
 
 SECRET = "test-secret"
 
 app = FastAPI()
+app.add_middleware(AuthMiddleware)
 
 @app.get("/protected")
 async def protected(auth: AuthenticatedContext = Depends(require_authorization)) -> dict[str, str]:

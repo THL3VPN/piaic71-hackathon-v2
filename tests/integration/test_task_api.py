@@ -142,6 +142,12 @@ def test_missing_token_rejected():
 
 def test_owned_tasks_only_listed_per_user():
     with TestClient(app) as client:
+        # Clean any existing tasks for these users to isolate the test
+        for header in (AUTH_HEADERS, AUTH_HEADERS_OTHER):
+            resp = client.get("/api/tasks", headers=header)
+            if resp.status_code == 200:
+                for task in resp.json():
+                    client.delete(f"/api/tasks/{task['id']}", headers=header)
         # user A creates two tasks
         for title in ["A1", "A2"]:
             assert client.post("/api/tasks", json={"title": title}, headers=AUTH_HEADERS).status_code == 201

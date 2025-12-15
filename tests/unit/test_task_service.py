@@ -45,7 +45,7 @@ async def session(engine: AsyncEngine) -> AsyncSession:
 
 @pytest.mark.anyio
 async def test_create_task_trims_and_sets_defaults(session: AsyncSession) -> None:
-    task = await task_repo.create_task(session, "  title  ", "desc")
+    task = await task_repo.create_task(session, owner_id="owner-1", title="  title  ", description="desc")
     assert task.id is not None
     assert task.title == "title"
     assert task.description == "desc"
@@ -55,7 +55,7 @@ async def test_create_task_trims_and_sets_defaults(session: AsyncSession) -> Non
 @pytest.mark.anyio
 async def test_create_task_rejects_empty_title(session: AsyncSession) -> None:
     with pytest.raises(ValueError):
-        await task_repo.create_task(session, "   ")
+        await task_repo.create_task(session, owner_id="owner-1", title="   ")
 
 
 @pytest.mark.anyio
@@ -65,23 +65,24 @@ async def test_get_task_handles_missing(session: AsyncSession) -> None:
 
 @pytest.mark.anyio
 async def test_list_tasks_orders_by_created_at(session: AsyncSession) -> None:
-    first = await task_repo.create_task(session, "first")
-    second = await task_repo.create_task(session, "second")
-    tasks = await task_repo.list_tasks(session)
+    first = await task_repo.create_task(session, owner_id="owner-1", title="first")
+    second = await task_repo.create_task(session, owner_id="owner-1", title="second")
+    tasks = await task_repo.list_tasks(session, owner_id="owner-1")
     assert [t.id for t in tasks] == [first.id, second.id]
 
 
 @pytest.mark.anyio
 async def test_list_tasks_handles_empty(session: AsyncSession) -> None:
-    tasks = await task_repo.list_tasks(session)
+    tasks = await task_repo.list_tasks(session, owner_id="owner-1")
     assert tasks == []
 
 
 @pytest.mark.anyio
 async def test_list_tasks_orders_by_created_at_even_with_custom_timestamps(session: AsyncSession) -> None:
-    earlier = await task_repo.create_task(session, "earlier")
-    later = await task_repo.create_task(session, "later")
-    middle = await task_repo.create_task(session, "middle")
+    owner = "owner-1"
+    earlier = await task_repo.create_task(session, owner_id=owner, title="earlier")
+    later = await task_repo.create_task(session, owner_id=owner, title="later")
+    middle = await task_repo.create_task(session, owner_id=owner, title="middle")
     base = datetime.now(timezone.utc)
     await session.execute(
         update(Task).where(Task.id == earlier.id).values(created_at=base + timedelta(seconds=5))
@@ -90,5 +91,5 @@ async def test_list_tasks_orders_by_created_at_even_with_custom_timestamps(sessi
         update(Task).where(Task.id == later.id).values(created_at=base - timedelta(seconds=5))
     )
     await session.commit()
-    tasks = await task_repo.list_tasks(session)
+    tasks = await task_repo.list_tasks(session, owner_id=owner)
     assert [t.id for t in tasks] == [later.id, middle.id, earlier.id]
