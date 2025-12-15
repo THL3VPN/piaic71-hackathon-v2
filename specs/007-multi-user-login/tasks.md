@@ -27,11 +27,11 @@
 - [X] T016 [US3] GREEN: Implement landing page (/), combined login/register UI, token persistence, redirect to /tasks in frontend/app/page.tsx + frontend/lib/auth.ts (depends on T015; deliverable: passing test)
 - [X] T017 [US3] RED: Add failing frontend test for tasks page fetching with JWT and logout clearing token in frontend/tests/tasks-auth.test.tsx (depends on T016; deliverable: red test)
 - [X] T018 [US3] GREEN: Wire tasks page to attach JWT, show user-owned tasks, add logout button that clears token and routes to / (depends on T017; deliverable: passing test)
-- [ ] T019 [US3] REFACTOR: Styling cleanup and shared fetch helper for auth headers in frontend/lib/* (depends on T018; deliverable: tidy frontend code)
+- [X] T019 [US3] REFACTOR: Styling cleanup and shared fetch helper for auth headers in frontend/lib/* (depends on T018; deliverable: tidy frontend code)
 
 ## Phase 6: Polish & Cross-Cutting
-- [ ] T020 Update quickstart.md with register/login curl + frontend notes (depends on T011; deliverable: updated docs)
-- [ ] T021 Add ADR capturing auth choices (bcrypt, HS256, 403 policy) in history/adr/ (depends on T011; deliverable: ADR)
+- [X] T020 Update quickstart.md with register/login curl + frontend notes (depends on T011; deliverable: updated docs)
+- [X] T021 Add ADR capturing auth choices (bcrypt, HS256, 403 policy) in history/adr/ (depends on T011; deliverable: ADR)
 - [ ] T022 Run full backend + frontend tests, verify coverage ≥80%, mark tasks done (depends on T019; deliverable: test report)
 
 ## Dependencies Overview

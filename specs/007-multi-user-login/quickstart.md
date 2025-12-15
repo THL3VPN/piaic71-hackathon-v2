@@ -13,7 +13,8 @@ export RUN_DB_TESTS=1  # optional if you want DB integration tests
 ## Frontend
 
 ```bash
-./scripts/bootstrap.sh frontend  # syncs frontend/.env.local and runs Next dev
+# syncs frontend/.env.local from .env and runs Next dev
+./scripts/bootstrap.sh frontend
 ```
 
 ## Manual flow (curl)
@@ -39,6 +40,12 @@ curl -X POST http://localhost:8000/api/tasks \
 curl -H "Authorization: Bearer $TOKEN" http://localhost:8000/api/tasks
 ```
 
+## Frontend flow
+
+- Visit `http://localhost:3000`
+- Use the combined Login/Register page to create an account or log in
+- After login you are redirected to `/tasks`, which lists only your tasks and attaches the JWT automatically
+
 ## Tests
 
 ```bash
@@ -47,4 +54,7 @@ DATABASE_URL=sqlite+aiosqlite:///:memory: \
 RUN_DB_TESTS=0 \
 UV_CACHE_DIR="$(pwd)/.uv-cache" \
 uv run python3.13 -m pytest --cov=src
+
+# Frontend
+(cd frontend && npm run test)
 ```

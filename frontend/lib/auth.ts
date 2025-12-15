@@ -14,6 +14,15 @@ export function clearToken(): void {
   localStorage.removeItem("auth_token");
 }
 
+export async function fetchWithAuth(input: string | URL, init: RequestInit = {}): Promise<Response> {
+  const headers = new Headers(init.headers || {});
+  const token = getToken();
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+  return fetch(input, { ...init, headers });
+}
+
 async function sendAuth(path: string, body: { username: string; password: string }): Promise<AuthResponse> {
   const res = await fetch(`${API_BASE}${path}`, {
     method: "POST",
