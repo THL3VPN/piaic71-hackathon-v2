@@ -17,6 +17,8 @@ export default function Page() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
+  const [signupNotice, setSignupNotice] = useState<string | null>(null);
+  const [createdUsername, setCreatedUsername] = useState("");
 
   useEffect(() => {
     fetchBackendHealth()
@@ -40,13 +42,15 @@ export default function Page() {
         const result = await login(username, password);
         saveToken(result.token);
         saveUsername(username);
+        setSignupNotice(null);
       } else {
         await register(username, password);
-        const result = await login(username, password);
-        saveToken(result.token);
-        saveUsername(username);
+        setCreatedUsername(username);
+        setSignupNotice(`User ${username} was created successfully.`);
       }
-      router.push("/tasks");
+      if (mode === "login") {
+        router.push("/tasks");
+      }
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Authentication failed";
@@ -129,6 +133,30 @@ export default function Page() {
           </button>
         </form>
       </section>
+      {signupNotice && (
+        <div className="signup-overlay" role="dialog" aria-modal="true">
+          <div className="signup-message signup-overlay-message">
+            <p className="signup-message-title">Account ready</p>
+            <p className="signup-message-text">{signupNotice}</p>
+              <div className="signup-message-actions">
+                <button
+                  type="button"
+                  className="landing-submit signup-message-cta"
+                onClick={() => {
+                  setMode("login");
+                  setSignupNotice(null);
+                  if (createdUsername) {
+                    setUsername(createdUsername);
+                    setPassword("");
+                  }
+                }}
+              >
+                Sign in
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

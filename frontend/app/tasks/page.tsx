@@ -82,14 +82,18 @@ export default function TasksPage() {
         <header className="page-header">
           <div>
             <p className="page-header-subtitle">Task operations</p>
-            <h1 className="page-header-title">Team backlog</h1>
-            {username && <p className="page-header-subtitle">Signed in as {username}</p>}
+            <h1 className="page-header-title">Team PIAIC-76</h1>
           </div>
         <div className="page-count-wrapper">
           <span className="page-count">{loading ? "Loading…" : `${tasks.length} tasks`}</span>
           <span className="page-count-secondary">Updated moments ago</span>
         </div>
         <div className="page-actions">
+          {username && (
+            <span className="form-button-secondary user-name-chip" aria-label={`Signed in as ${username}`}>
+              {username}
+            </span>
+          )}
           <button
             type="button"
             className="form-button-secondary"
