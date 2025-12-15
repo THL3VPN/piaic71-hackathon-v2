@@ -7,6 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engin
 from sqlalchemy.pool import StaticPool
 from sqlmodel import SQLModel
 
+# Import models to ensure metadata includes all tables
+from src import models  # noqa: F401
 
 _engine: Optional[AsyncEngine] = None
 

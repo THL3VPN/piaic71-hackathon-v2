@@ -7,7 +7,7 @@ from src.services import auth as auth_services
 from src.api import schemas
 from src.services import db, task_repo
 
-router = APIRouter(dependencies=[Depends(auth_services.require_authorization)])
+router = APIRouter()
 
 @router.post(
     "/tasks",
@@ -17,9 +17,11 @@ router = APIRouter(dependencies=[Depends(auth_services.require_authorization)])
 async def create_task(
     payload: schemas.TaskCreate,
     session: AsyncSession = Depends(db.get_session),
-    _: auth_services.AuthenticatedContext = Depends(auth_services.get_authenticated_context),
+    auth_ctx: auth_services.AuthenticatedContext = Depends(auth_services.require_authorization),
 ) -> schemas.TaskRead:
-    task = await task_repo.create_task(session, payload.title, payload.description)
+    task = await task_repo.create_task(
+        session, owner_id=auth_ctx.user_id, title=payload.title, description=payload.description
+    )
     return task
 
 @router.get(
@@ -28,9 +30,9 @@ async def create_task(
 )
 async def list_tasks(
     session: AsyncSession = Depends(db.get_session),
-    _: auth_services.AuthenticatedContext = Depends(auth_services.get_authenticated_context),
+    auth_ctx: auth_services.AuthenticatedContext = Depends(auth_services.require_authorization),
 ) -> list[schemas.TaskRead]:
-    tasks = await task_repo.list_tasks(session)
+    tasks = await task_repo.list_tasks(session, owner_id=auth_ctx.user_id)
     return tasks
 
 
@@ -41,9 +43,9 @@ async def list_tasks(
 async def get_task(
     task_id: int,
     session: AsyncSession = Depends(db.get_session),
-    _: auth_services.AuthenticatedContext = Depends(auth_services.get_authenticated_context),
+    auth_ctx: auth_services.AuthenticatedContext = Depends(auth_services.require_authorization),
 ) -> schemas.TaskRead:
-    task = await task_repo.get_task_or_404(session, task_id)
+    task = await task_repo.get_owned_task_or_404(session, task_id, owner_id=auth_ctx.user_id)
     return task
 
 
@@ -55,9 +57,11 @@ async def update_task(
     task_id: int,
     payload: schemas.TaskUpdate,
     session: AsyncSession = Depends(db.get_session),
-    _: auth_services.AuthenticatedContext = Depends(auth_services.get_authenticated_context),
+    auth_ctx: auth_services.AuthenticatedContext = Depends(auth_services.require_authorization),
 ) -> schemas.TaskRead:
-    task = await task_repo.update_task(session, task_id, payload.title, payload.description)
+    task = await task_repo.update_task(
+        session, task_id, owner_id=auth_ctx.user_id, title=payload.title, description=payload.description
+    )
     return task
 
 
@@ -68,9 +72,9 @@ async def update_task(
 async def delete_task(
     task_id: int,
     session: AsyncSession = Depends(db.get_session),
-    _: auth_services.AuthenticatedContext = Depends(auth_services.get_authenticated_context),
+    auth_ctx: auth_services.AuthenticatedContext = Depends(auth_services.require_authorization),
 ) -> None:
-    await task_repo.delete_task(session, task_id)
+    await task_repo.delete_task(session, task_id, owner_id=auth_ctx.user_id)
 
 
 @router.patch(
@@ -80,7 +84,7 @@ async def delete_task(
 async def toggle_task_completion(
     task_id: int,
     session: AsyncSession = Depends(db.get_session),
-    _: auth_services.AuthenticatedContext = Depends(auth_services.get_authenticated_context),
+    auth_ctx: auth_services.AuthenticatedContext = Depends(auth_services.require_authorization),
 ) -> schemas.TaskRead:
-    task = await task_repo.toggle_task_completion(session, task_id)
+    task = await task_repo.toggle_task_completion(session, task_id, owner_id=auth_ctx.user_id)
     return task

@@ -24,6 +24,7 @@ def _build_token(user_id: str) -> str:
 
 MISSING_TASK_DETAIL = {"detail": "Task not found"}
 AUTH_HEADERS = {"Authorization": f"Bearer {_build_token('integration-user')}"}
+AUTH_HEADERS_OTHER = {"Authorization": f"Bearer {_build_token('other-user')}"}
 
 
 def test_post_then_get_tasks():
@@ -130,3 +131,54 @@ def test_update_task_validation_error():
         assert bad_put.status_code == 422
         detail = bad_put.json()["detail"]
         assert detail[0]["loc"][-1] == "title"
+
+
+def test_missing_token_rejected():
+    with TestClient(app) as client:
+        resp = client.get("/api/tasks")
+        assert resp.status_code == 401
+        assert "detail" in resp.json()
+
+
+def test_owned_tasks_only_listed_per_user():
+    with TestClient(app) as client:
+        # user A creates two tasks
+        for title in ["A1", "A2"]:
+            assert client.post("/api/tasks", json={"title": title}, headers=AUTH_HEADERS).status_code == 201
+        # user B creates one task
+        assert client.post("/api/tasks", json={"title": "B1"}, headers=AUTH_HEADERS_OTHER).status_code == 201
+
+        list_a = client.get("/api/tasks", headers=AUTH_HEADERS)
+        assert list_a.status_code == 200
+        tasks_a = [t["title"] for t in list_a.json()]
+        assert tasks_a == ["A1", "A2"]
+
+        list_b = client.get("/api/tasks", headers=AUTH_HEADERS_OTHER)
+        assert list_b.status_code == 200
+        tasks_b = [t["title"] for t in list_b.json()]
+        assert tasks_b == ["B1"]
+
+
+def test_cross_user_access_forbidden_or_not_found():
+    with TestClient(app) as client:
+        create = client.post("/api/tasks", json={"title": "Private"}, headers=AUTH_HEADERS)
+        assert create.status_code == 201
+        task_id = create.json()["id"]
+
+        # other user should not see/update/delete
+        get_other = client.get(f"/api/tasks/{task_id}", headers=AUTH_HEADERS_OTHER)
+        assert get_other.status_code in (403, 404)
+
+        put_other = client.put(
+            f"/api/tasks/{task_id}",
+            json={"title": "Hacked", "description": "bad"},
+            headers=AUTH_HEADERS_OTHER,
+        )
+        assert put_other.status_code in (403, 404)
+
+        delete_other = client.delete(f"/api/tasks/{task_id}", headers=AUTH_HEADERS_OTHER)
+        assert delete_other.status_code in (403, 404)
+
+        # owner still can delete
+        delete_owner = client.delete(f"/api/tasks/{task_id}", headers=AUTH_HEADERS)
+        assert delete_owner.status_code == 204

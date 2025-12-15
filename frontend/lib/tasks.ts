@@ -1,7 +1,5 @@
 import { Task } from "./types";
-
-const AUTH_TOKEN = process.env.NEXT_PUBLIC_BETTER_AUTH_TOKEN;
-const authHeader = AUTH_TOKEN ? { Authorization: `Bearer ${AUTH_TOKEN}` } : {};
+import { authHeaders } from "./auth";
 
 const BASE_URL = "http://localhost:8000/api/tasks";
 
@@ -23,7 +21,7 @@ async function parsedResponse<T>(res: Response): Promise<T> {
 
 export async function fetchTasks(): Promise<Task[]> {
   const res = await fetch(BASE_URL, {
-    headers: { Accept: "application/json", ...authHeader },
+    headers: { Accept: "application/json", ...authHeaders() },
     cache: "no-store",
   });
 
@@ -34,7 +32,7 @@ export async function submitTask(payload: TaskPayload, options?: { retry?: boole
   const attempt = async () => {
     const res = await fetch(BASE_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json", ...authHeader },
+      headers: { "Content-Type": "application/json", Accept: "application/json", ...authHeaders() },
       body: JSON.stringify(payload),
     });
     return parsedResponse<Task>(res);
@@ -53,7 +51,7 @@ export async function submitTask(payload: TaskPayload, options?: { retry?: boole
 export async function updateTask(id: number, payload: TaskPayload): Promise<Task> {
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json", Accept: "application/json", ...authHeader },
+    headers: { "Content-Type": "application/json", Accept: "application/json", ...authHeaders() },
     body: JSON.stringify(payload),
   });
   return parsedResponse<Task>(res);
@@ -62,7 +60,7 @@ export async function updateTask(id: number, payload: TaskPayload): Promise<Task
 export async function deleteTask(id: number): Promise<void> {
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: "DELETE",
-    headers: { ...authHeader },
+    headers: { ...authHeaders() },
   });
   if (!res.ok) {
     throw new Error(`Failed to delete task: ${res.status} ${res.statusText}`);
@@ -72,7 +70,7 @@ export async function deleteTask(id: number): Promise<void> {
 export async function toggleTaskCompletion(id: number): Promise<Task> {
   const res = await fetch(`${BASE_URL}/${id}/complete`, {
     method: "PATCH",
-    headers: { Accept: "application/json", ...authHeader },
+    headers: { Accept: "application/json", ...authHeaders() },
   });
   return parsedResponse<Task>(res);
 }

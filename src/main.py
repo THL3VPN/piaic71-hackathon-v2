@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.api import health as health_router
 from src.api import tasks as tasks_router
+from src.api import auth as auth_router
 from src.cli import menu
 from src.services import auth
 from src.services import db
@@ -17,15 +18,21 @@ _engine: Optional[AsyncEngine] = None
 
 app = FastAPI()
 frontend_origin = os.getenv("NEXT_PUBLIC_API_BASE_URL") or "http://localhost:3000"
+allowed_origins = {
+    frontend_origin.rstrip("/"),
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+}
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[frontend_origin, "http://localhost:3000"],
+    allow_origins=list(allowed_origins),
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True,
 )
 app.add_middleware(auth.AuthMiddleware)
 app.include_router(health_router.router)
+app.include_router(auth_router.router, prefix="/api")
 app.include_router(tasks_router.router, prefix="/api")
 
 

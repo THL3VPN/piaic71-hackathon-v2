@@ -1,7 +1,7 @@
 import { HealthStatus } from "./types";
 
 const explicitBackendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-const FALLBACK_ENDPOINT = "/api/health";
+const FALLBACK_ENDPOINT = "/health";
 const HEALTH_URL = explicitBackendUrl ? `${explicitBackendUrl}/health` : FALLBACK_ENDPOINT;
 
 export async function fetchBackendHealth(): Promise<HealthStatus> {

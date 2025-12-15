@@ -10,6 +10,7 @@ class Task(SQLModel, table=True):
     """Task table persisted in the database."""
 
     id: int | None = Field(default=None, primary_key=True)
+    owner_id: str = Field(index=True, nullable=False)
     title: str = Field(index=True)
     description: str | None = None
     completed: bool = Field(default=False)
