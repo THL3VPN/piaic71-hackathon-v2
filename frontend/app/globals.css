@@ -191,6 +191,17 @@ body {
   flex-wrap: wrap;
 }
 
+.page-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.page-actions .form-button-secondary {
+  min-width: 124px;
+}
+
 .page-header-title {
   font-size: clamp(2.5rem, 4vw, 3.75rem);
   margin: 0.1rem 0;
@@ -428,4 +439,20 @@ body {
 .form-button-secondary:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+.user-name-chip {
+  padding: 0;
+  width: 124px;
+  height: 44px;
+  border-radius: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #22d3ee, #0ea5e9);
+  color: #021c1c;
+  border: 1px solid rgba(34, 211, 238, 0.6);
+  box-shadow: 0 12px 30px rgba(14, 165, 233, 0.35);
 }
