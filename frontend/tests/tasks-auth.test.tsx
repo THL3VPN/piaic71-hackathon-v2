@@ -31,12 +31,12 @@ describe("Tasks page with auth", () => {
     render(<TasksPage />);
 
     expect(await screen.findByText("Auth task")).toBeInTheDocument();
-    expect(fetch).toHaveBeenCalledWith(
-      "http://localhost:8000/api/tasks",
-      expect.objectContaining({
-        headers: expect.objectContaining({ Authorization: "Bearer jwt-token" }),
-      })
-    );
+    const call = (fetch as vi.Mock).mock.calls[0];
+    expect(call[0]).toBe("http://localhost:8000/api/tasks");
+    const headers = call[1]?.headers;
+    const authHeader =
+      headers instanceof Headers ? headers.get("Authorization") : headers?.Authorization || headers?.authorization;
+    expect(authHeader).toBe("Bearer jwt-token");
   });
 
   it("publishes logout to clear token and navigate back", async () => {

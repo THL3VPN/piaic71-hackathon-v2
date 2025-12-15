@@ -3,6 +3,10 @@ import { afterEach, describe, it, vi } from "vitest";
 import React from "react";
 import Page from "../app/page";
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+}));
+
 describe("Page", () => {
   afterEach(() => {
     vi.restoreAllMocks();
