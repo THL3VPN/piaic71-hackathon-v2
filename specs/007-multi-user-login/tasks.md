@@ -32,7 +32,7 @@
 ## Phase 6: Polish & Cross-Cutting
 - [X] T020 Update quickstart.md with register/login curl + frontend notes (depends on T011; deliverable: updated docs)
 - [X] T021 Add ADR capturing auth choices (bcrypt, HS256, 403 policy) in history/adr/ (depends on T011; deliverable: ADR)
-- [ ] T022 Run full backend + frontend tests, verify coverage ≥80%, mark tasks done (depends on T019; deliverable: test report)
+- [X] T022 Run full backend + frontend tests, verify coverage ≥80%, mark tasks done (depends on T019; deliverable: test report)
 
 ## Dependencies Overview
 - T001 → T002 → T003/T006 → T004/T007 → T005/T008 → T009 → T010 → T012 → T013 → T014 → T020/T021/T022

@@ -36,9 +36,14 @@ export default function Page() {
     evt.preventDefault();
     setFormError(null);
     try {
-      const action = mode === "login" ? login : register;
-      const result = await action(username, password);
-      saveToken(result.token);
+      if (mode === "login") {
+        const result = await login(username, password);
+        saveToken(result.token);
+      } else {
+        await register(username, password);
+        const result = await login(username, password);
+        saveToken(result.token);
+      }
       router.push("/tasks");
     } catch (err) {
       const message =
