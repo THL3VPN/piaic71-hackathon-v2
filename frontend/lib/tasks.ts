@@ -1,4 +1,5 @@
 import { Task } from "./types";
+import { fetchWithAuth } from "./auth";
 
 const BASE_URL = "http://localhost:8000/api/tasks";
 
@@ -19,17 +20,14 @@ async function parsedResponse<T>(res: Response): Promise<T> {
 }
 
 export async function fetchTasks(): Promise<Task[]> {
-  const res = await fetch(BASE_URL, {
-    headers: { Accept: "application/json" },
-    cache: "no-store",
-  });
+  const res = await fetchWithAuth(BASE_URL, { headers: { Accept: "application/json" }, cache: "no-store" });
 
   return parsedResponse(res);
 }
 
 export async function submitTask(payload: TaskPayload, options?: { retry?: boolean }): Promise<Task> {
   const attempt = async () => {
-    const res = await fetch(BASE_URL, {
+    const res = await fetchWithAuth(BASE_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify(payload),
@@ -48,7 +46,7 @@ export async function submitTask(payload: TaskPayload, options?: { retry?: boole
 }
 
 export async function updateTask(id: number, payload: TaskPayload): Promise<Task> {
-  const res = await fetch(`${BASE_URL}/${id}`, {
+  const res = await fetchWithAuth(`${BASE_URL}/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify(payload),
@@ -57,18 +55,13 @@ export async function updateTask(id: number, payload: TaskPayload): Promise<Task
 }
 
 export async function deleteTask(id: number): Promise<void> {
-  const res = await fetch(`${BASE_URL}/${id}`, {
-    method: "DELETE",
-  });
+  const res = await fetchWithAuth(`${BASE_URL}/${id}`, { method: "DELETE" });
   if (!res.ok) {
     throw new Error(`Failed to delete task: ${res.status} ${res.statusText}`);
   }
 }
 
 export async function toggleTaskCompletion(id: number): Promise<Task> {
-  const res = await fetch(`${BASE_URL}/${id}/complete`, {
-    method: "PATCH",
-    headers: { Accept: "application/json" },
-  });
+  const res = await fetchWithAuth(`${BASE_URL}/${id}/complete`, { method: "PATCH", headers: { Accept: "application/json" } });
   return parsedResponse<Task>(res);
 }

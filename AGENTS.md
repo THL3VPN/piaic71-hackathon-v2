@@ -181,6 +181,9 @@ This ensures predictable, deterministic development.
 - Backend health endpoint (stateless JSON), no new storage required (001-frontend-health)
 - Backend UV-managed Python 3.12+, Frontend Next.js 18.3 (App Router) with TypeScript + backend already uses UV + pytest; frontend will use Next.js + Vitest/Testing Library + ESLint flat config (005-linking-api-to-frontends)
 - PostgreSQL (Neon) provided by backend service, accessible via existing SQLModel task API (005-linking-api-to-frontends)
+- Python 3.12+ (required) + UV-managed Python packages [list specifics] (006-jwt-auth)
+- Python 3.13 (per repo) with type hints everywhere. + FastAPI, SQLModel + psycopg (Neon), passlib[bcrypt] for password hashing, jose/pyjwt for JWT, anyio/pytest for async tests. (001-user-pass-tasks)
+- Neon PostgreSQL via `DATABASE_URL`; tasks and users in SQLModel. (001-user-pass-tasks)
 
 ## Recent Changes
 - 001-interactive-todo-cli: Added Python 3.12+ (required) + UV-managed Python packages: typer (entry wrapper), questionary (interactive menus), rich (tables/messages), pytest (tests)

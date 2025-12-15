@@ -23,4 +23,23 @@ class TaskRead(TaskBase):
     id: int
     completed: bool
     created_at: datetime
+class RegisterRequest(SQLModel):
+    username: str = Field(..., min_length=1)
+    password: str = Field(..., min_length=6)
+
+
+class RegisterResponse(SQLModel):
+    id: int
+    username: str
+
+
+class LoginRequest(SQLModel):
+    username: str = Field(..., min_length=1)
+    password: str = Field(..., min_length=6)
+
+
+class LoginResponse(SQLModel):
+    token: str
+    token_type: str = "bearer"
+    expires_in: int | None = None
 

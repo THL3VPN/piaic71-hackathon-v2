@@ -1,45 +1,133 @@
- "use client";
+"use client";
+
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { fetchBackendHealth } from "../lib/health";
+import { login, register, saveToken, saveUsername } from "../lib/auth";
 import { HealthStatus } from "../lib/types";
 
+type FormMode = "login" | "register";
+
 export default function Page() {
+  const router = useRouter();
   const [status, setStatus] = useState<HealthStatus | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [healthError, setHealthError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mode, setMode] = useState<FormMode>("login");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [formError, setFormError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchBackendHealth()
       .then((data) => {
         setStatus(data);
-        setError(null);
+        setHealthError(null);
       })
       .catch((err) => {
         console.error("Health check failed", err);
         setStatus(null);
-        setError(err instanceof Error ? err.message : "Unknown error");
+        setHealthError(err instanceof Error ? err.message : "Unknown error");
       })
       .finally(() => setLoading(false));
   }, []);
 
+  const handleSubmit = async (evt: React.FormEvent) => {
+    evt.preventDefault();
+    setFormError(null);
+    try {
+      if (mode === "login") {
+        const result = await login(username, password);
+        saveToken(result.token);
+        saveUsername(username);
+      } else {
+        await register(username, password);
+        const result = await login(username, password);
+        saveToken(result.token);
+        saveUsername(username);
+      }
+      router.push("/tasks");
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Authentication failed";
+      setFormError(message);
+    }
+  };
+
   return (
-    <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center p-6">
-      <section className="space-y-4 border border-white/20 rounded-2xl p-8 bg-white/5 shadow-2xl">
-        <h1 className="text-3xl font-semibold tracking-tight">Backend Health</h1>
-        {status && (
-          <p className="text-lg">
-            Backend: <strong>{status.status}</strong>
+    <main className="landing-shell">
+      <section className="landing-card">
+        <div className="landing-hero">
+          <p className="landing-kicker">TaskBoard</p>
+          <h1 className="landing-title">Welcome</h1>
+          <p className="landing-subtitle">Sign in or create an account to manage your tasks.</p>
+        </div>
+
+        <div className="landing-health">
+          <p className="landing-health-row">
+            <span className="landing-dot" />
+            Backend: {status ? status.status : healthError ? "unavailable" : "checking..."}
           </p>
-        )}
-        {error && (
-          <p className="text-red-400">
-            Backend: unavailable
-            <span className="block text-sm text-red-200">{error}</span>
-          </p>
-        )}
-        {loading && !status && !error && (
-          <p className="text-sm text-slate-300">Checking backend status...</p>
-        )}
+          {healthError && (
+            <p className="landing-health-alert" role="alert">
+              {healthError}
+            </p>
+          )}
+          {loading && !status && !healthError && (
+            <p className="landing-health-muted">Checking backend status...</p>
+          )}
+        </div>
+
+        <div className="landing-modes">
+          <button
+            className={`landing-pill ${mode === "login" ? "landing-pill-active" : ""}`}
+            onClick={() => setMode("login")}
+            type="button"
+          >
+            Sign in
+          </button>
+          <button
+            className={`landing-pill ${mode === "register" ? "landing-pill-active" : ""}`}
+            onClick={() => setMode("register")}
+            type="button"
+          >
+            Create account
+          </button>
+        </div>
+
+        <form className="landing-form" onSubmit={handleSubmit}>
+          <label className="landing-label">
+            Username
+            <input
+              aria-label="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="landing-input"
+              autoComplete="username"
+            />
+          </label>
+          <label className="landing-label">
+            Password
+            <input
+              aria-label="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="landing-input"
+              autoComplete={mode === "login" ? "current-password" : "new-password"}
+            />
+          </label>
+
+          {formError && (
+            <p className="landing-error" role="alert">
+              {formError}
+            </p>
+          )}
+
+          <button type="submit" className="landing-submit">
+            {mode === "login" ? "Login" : "Register"}
+          </button>
+        </form>
       </section>
     </main>
   );

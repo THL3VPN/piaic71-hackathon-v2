@@ -10,18 +10,22 @@ import {
   validateTaskPayload,
 } from "../../lib/tasks";
 import { Task } from "../../lib/types";
+import { clearSession, getUsername } from "../../lib/auth";
 import React, { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const tabs = [
   { id: "view", label: "View tasks" },
-  { id: "add", label: "Add task" },
+  { id: "add", label: "Task form" },
 ];
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState(tabs[0].id);
+  const [username] = useState(() => getUsername());
   const [formData, setFormData] = useState<TaskPayload>({ title: "", description: "" });
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -79,12 +83,25 @@ export default function TasksPage() {
           <div>
             <p className="page-header-subtitle">Task operations</p>
             <h1 className="page-header-title">Team backlog</h1>
+            {username && <p className="page-header-subtitle">Signed in as {username}</p>}
           </div>
-          <div className="page-count-wrapper">
-            <span className="page-count">{loading ? "Loading…" : `${tasks.length} tasks`}</span>
-            <span className="page-count-secondary">Updated moments ago</span>
-          </div>
-        </header>
+        <div className="page-count-wrapper">
+          <span className="page-count">{loading ? "Loading…" : `${tasks.length} tasks`}</span>
+          <span className="page-count-secondary">Updated moments ago</span>
+        </div>
+        <div className="page-actions">
+          <button
+            type="button"
+            className="form-button-secondary"
+            onClick={() => {
+              clearSession();
+              router.push("/");
+            }}
+          >
+            Logout
+          </button>
+        </div>
+      </header>
 
         {error && (
           <div role="alert" aria-live="assertive" className="alert">
@@ -107,6 +124,9 @@ export default function TasksPage() {
 
         {activeTab === "view" && (
           <div className="page-grid">
+            {!loading && filteredTasks.length === 0 && (
+              <p className="empty-state">No tasks yet</p>
+            )}
             {filteredTasks.map((task) => (
               <article key={task.id} className="task-card">
                 <div className="task-card-header">
@@ -189,6 +209,7 @@ export default function TasksPage() {
               onClick={() => {
                 setEditingTaskId(null);
                 setFormData({ title: "", description: "" });
+                setFormError(null);
               }}
             >
               Reset

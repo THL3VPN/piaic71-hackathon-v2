@@ -1,0 +1,52 @@
+/specs
+
+Feature: Secure API requests with JWT verification (Better Auth compatible)
+
+User journeys
+1.1 A signed-in frontend user makes an API request with a JWT token
+1.2 Backend accepts valid tokens and rejects invalid/missing tokens
+1.3 Developer can test protected endpoints locally with a known JWT
+
+Acceptance criteria
+2.1 Backend requires Authorization: Bearer <token> for all /api/* endpoints
+2.2 Requests without a token return 401 Unauthorized
+2.3 Requests with an invalid/expired token return 401 Unauthorized
+2.4 Requests with a valid token succeed
+2.5 Backend verifies JWT signature using shared secret BETTER_AUTH_SECRET from environment
+2.6 Backend extracts user identity from the token (at minimum: user id / subject) and makes it available to route handlers
+2.7 A clear error response format exists for auth failures
+2.8 No user-specific filtering is required in this step (just verification + extraction)
+2.9 pytest covers: missing token, invalid token, valid token
+
+Success metrics
+3.1 All pytest tests pass for JWT auth behavior
+3.2 Manual test: calling a protected endpoint without token returns 401
+3.3 Manual test: calling a protected endpoint with a valid token returns 200
+3.4 No regressions in existing task API tests (updated to include auth where needed)
+
+/prompts:sp.plan
+
+Create: architecture sketch, interfaces, data model, error handling, requirements.
+Decisions needing: list important choices with options and tradeoffs.
+Testing strategy: unit + integration tests based on acceptance criteria.
+Technical details:
+- Use a simple, functional approach where it makes sense
+- Follow TDD: write tests first, then implementation
+- Organize code and tests according to your constitution rules
+
+/sp.tasks
+
+Break plan into small tasks (T001..), each ≤ 3 minutes, testable, reversible.
+Add dependencies between tasks; group into phases; mark deliverables per task. Group tasks by operations and for each operation like add use TDD approach so RED Tests, Green Tests and Refactor. After each group we pause for human review and on approval commit to github.
+
+Focus on:
+- TDD approach (tests first for each operation)
+- Small, step-by-step implementation
+- Clear task dependencies
+- Easy to undo changes
+
+/sp.implement
+
+Rules: tests first, smallest diff, keep public API stable within a phase.
+After each task: run tests, update checklist, note deltas to spec if needed Mark completed tasks in tasks.md
+

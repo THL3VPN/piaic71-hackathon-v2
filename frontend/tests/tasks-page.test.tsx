@@ -2,6 +2,10 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, expect, it, vi, afterEach } from "vitest";
 import TasksPage from "../app/tasks/page";
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+}));
+
 describe("TasksPage", () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -38,6 +42,7 @@ describe("TasksPage", () => {
 
     await screen.findByText(/No tasks yet/i);
 
+    fireEvent.click(screen.getByRole("button", { name: /Task form/i }));
     fireEvent.click(screen.getByRole("button", { name: /Add task/i }));
     expect(await screen.findByText(/title is required/i)).toBeInTheDocument();
 
