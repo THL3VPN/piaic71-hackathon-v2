@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from src.api import health as health_router
 from src.api import tasks as tasks_router
 from src.cli import menu
+from src.services import auth
 from src.services import db
 
 _engine: Optional[AsyncEngine] = None
@@ -21,7 +22,9 @@ app.add_middleware(
     allow_origins=[frontend_origin, "http://localhost:3000"],
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_credentials=True,
 )
+app.add_middleware(auth.AuthMiddleware)
 app.include_router(health_router.router)
 app.include_router(tasks_router.router, prefix="/api")
 

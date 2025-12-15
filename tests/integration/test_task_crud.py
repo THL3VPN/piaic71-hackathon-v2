@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 import anyio
-import os
 import asyncio
+import os
+
 import pytest
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 
+from src import main as app_module
 from src.models.task import Task
 from src.services import db, task_repo
 
