@@ -42,6 +42,7 @@ describe("TasksPage", () => {
 
     await screen.findByText(/No tasks yet/i);
 
+    fireEvent.click(screen.getByRole("button", { name: /Task form/i }));
     fireEvent.click(screen.getByRole("button", { name: /Add task/i }));
     expect(await screen.findByText(/title is required/i)).toBeInTheDocument();
 

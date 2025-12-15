@@ -6,12 +6,25 @@ export function saveToken(token: string): void {
   localStorage.setItem("auth_token", token);
 }
 
+export function saveUsername(username: string): void {
+  localStorage.setItem("auth_username", username);
+}
+
 export function getToken(): string | null {
   return typeof window === "undefined" ? null : localStorage.getItem("auth_token");
 }
 
+export function getUsername(): string | null {
+  return typeof window === "undefined" ? null : localStorage.getItem("auth_username");
+}
+
 export function clearToken(): void {
   localStorage.removeItem("auth_token");
+}
+
+export function clearSession(): void {
+  clearToken();
+  localStorage.removeItem("auth_username");
 }
 
 export async function fetchWithAuth(input: string | URL, init: RequestInit = {}): Promise<Response> {

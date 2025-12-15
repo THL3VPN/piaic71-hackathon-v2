@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { fetchBackendHealth } from "../lib/health";
-import { login, register, saveToken } from "../lib/auth";
+import { login, register, saveToken, saveUsername } from "../lib/auth";
 import { HealthStatus } from "../lib/types";
 
 type FormMode = "login" | "register";
@@ -39,10 +39,12 @@ export default function Page() {
       if (mode === "login") {
         const result = await login(username, password);
         saveToken(result.token);
+        saveUsername(username);
       } else {
         await register(username, password);
         const result = await login(username, password);
         saveToken(result.token);
+        saveUsername(username);
       }
       router.push("/tasks");
     } catch (err) {
