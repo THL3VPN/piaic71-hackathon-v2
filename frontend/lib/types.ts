@@ -5,7 +5,7 @@ export type HealthStatus = {
 };
 
 export type Task = {
-  id: string;
+  id: number;
   title: string;
   description?: string;
   completed: boolean;
