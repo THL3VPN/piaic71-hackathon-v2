@@ -1,0 +1,5 @@
+{
+  "name": "piaic71-hackathon-v2",
+  "private": true,
+  "workspaces": ["frontend"]
+}
