@@ -21,11 +21,7 @@ app = FastAPI()
 
 
 def _parse_allowed_origins() -> list[str]:
-    raw = (
-        os.getenv("CORS_ALLOWED_ORIGINS")
-        or os.getenv("NEXT_PUBLIC_API_BASE_URL")  # legacy name
-        or "http://localhost:3000"
-    )
+    raw = os.getenv("CORS_ALLOWED_ORIGINS") or "http://localhost:3000"
     parts = [p.strip() for p in raw.split(",")]
     origins = {p.rstrip("/") for p in parts if p}
     origins.update({"http://localhost:3000", "http://127.0.0.1:3000"})
