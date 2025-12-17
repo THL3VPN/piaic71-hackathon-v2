@@ -29,9 +29,9 @@ These are the variables you typically need to change:
 - `DATABASE_URL` (backend): Postgres connection string (Neon/Render/etc.)
 - `BETTER_AUTH_SECRET` (backend): JWT signing secret (must stay consistent)
 - `NEXT_PUBLIC_BACKEND_URL` (frontend): Base URL of the backend (no trailing slash)
-- `NEXT_PUBLIC_API_BASE_URL` (backend CORS): The *frontend origin* to allow for CORS.
+- `CORS_ALLOWED_ORIGINS` (backend CORS): Comma-separated list of allowed frontend origins.
   - Example: `https://piaic71-hackathon-v2-frontend.vercel.app`
-  - This must match the browser origin exactly (scheme + host + port), no trailing slash.
+  - Must match the browser origin exactly (scheme + host + port), no trailing slash.
 
 ## Tests
 

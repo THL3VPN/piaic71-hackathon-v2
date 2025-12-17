@@ -3,9 +3,10 @@ from __future__ import annotations
 import logging
 import os
 from typing import Any, Optional
+
 from fastapi import FastAPI
-from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncEngine
+from starlette.middleware.cors import CORSMiddleware
 
 from src.api import health as health_router
 from src.api import tasks as tasks_router
@@ -17,18 +18,27 @@ from src.services import db
 _engine: Optional[AsyncEngine] = None
 
 app = FastAPI()
-frontend_origin = os.getenv("NEXT_PUBLIC_API_BASE_URL") or "http://localhost:3000"
-allowed_origins = {
-    frontend_origin.rstrip("/"),
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-}
+
+
+def _parse_allowed_origins() -> list[str]:
+    raw = (
+        os.getenv("CORS_ALLOWED_ORIGINS")
+        or os.getenv("NEXT_PUBLIC_API_BASE_URL")  # legacy name
+        or "http://localhost:3000"
+    )
+    parts = [p.strip() for p in raw.split(",")]
+    origins = {p.rstrip("/") for p in parts if p}
+    origins.update({"http://localhost:3000", "http://127.0.0.1:3000"})
+    return sorted(origins)
+
+
+allowed_origins = _parse_allowed_origins()
 # Ensure CORS headers are present even on auth failures (401/403):
 # middleware are executed in reverse order of addition; the last added is outermost.
 app.add_middleware(auth.AuthMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=list(allowed_origins),
+    allow_origins=allowed_origins,
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True,

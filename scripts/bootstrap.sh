@@ -29,7 +29,6 @@ ensure_env() {
   set +a
   : "${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET must be set in .env}"
   : "${DATABASE_URL:?DATABASE_URL must be set in .env (Postgres/Neon)}"
-  : "${NEXT_PUBLIC_BETTER_AUTH_TOKEN:?NEXT_PUBLIC_BETTER_AUTH_TOKEN must be set in .env}"
   export UV_PYTHON="${UV_PYTHON:-python3.13}"
   export UV_CACHE_DIR="${UV_CACHE_DIR:-${ROOT}/.uv-cache}"
   export BACKEND_PORT="${BACKEND_PORT:-8000}"
@@ -41,7 +40,6 @@ sync_frontend_env() {
   ensure_env
   mkdir -p "${ROOT}/frontend"
   cat > "${FRONTEND_ENV}" <<EOF
-NEXT_PUBLIC_BETTER_AUTH_TOKEN=${NEXT_PUBLIC_BETTER_AUTH_TOKEN}
 NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
 EOF
   echo "Wrote ${FRONTEND_ENV}"
