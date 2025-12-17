@@ -1,7 +1,8 @@
 import { Task } from "./types";
 import { fetchWithAuth } from "./auth";
 
-const BASE_URL = "http://localhost:8000/api/tasks";
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+const BASE_URL = `${backendUrl.replace(/\/$/, "")}/api/tasks`;
 
 export type TaskPayload = { title: string; description?: string };
 
