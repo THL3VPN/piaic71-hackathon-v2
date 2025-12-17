@@ -82,7 +82,7 @@ export default function TasksPage() {
         <header className="page-header">
           <div>
             <p className="page-header-subtitle">Task operations</p>
-            <h1 className="page-header-title">Team PIAIC-76</h1>
+            <h1 className="page-header-title">Team PIAIC-71</h1>
           </div>
         <div className="page-count-wrapper">
           <span className="page-count">{loading ? "Loading…" : `${tasks.length} tasks`}</span>

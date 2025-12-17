@@ -24,7 +24,7 @@ describe("TasksPage", () => {
 
     expect(fetch).toHaveBeenCalledWith("http://localhost:8000/api/tasks", expect.any(Object));
     expect(await screen.findByText("Sample task")).toBeInTheDocument();
-    expect(screen.getByText("Team PIAIC-76")).toBeInTheDocument();
+    expect(screen.getByText("Team PIAIC-71")).toBeInTheDocument();
   });
 
   it("validates and submits the add-task form", async () => {
