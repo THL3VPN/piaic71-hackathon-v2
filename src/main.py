@@ -23,6 +23,9 @@ allowed_origins = {
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 }
+# Ensure CORS headers are present even on auth failures (401/403):
+# middleware are executed in reverse order of addition; the last added is outermost.
+app.add_middleware(auth.AuthMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=list(allowed_origins),
@@ -30,7 +33,6 @@ app.add_middleware(
     allow_headers=["*"],
     allow_credentials=True,
 )
-app.add_middleware(auth.AuthMiddleware)
 app.include_router(health_router.router)
 app.include_router(auth_router.router, prefix="/api")
 app.include_router(tasks_router.router, prefix="/api")
