@@ -11,6 +11,9 @@ from starlette.middleware.cors import CORSMiddleware
 from src.api import health as health_router
 from src.api import tasks as tasks_router
 from src.api import auth as auth_router
+from src.api import conversations as conversations_router
+
+# [Task]: T010 [From]: specs/008-chat-storage/spec.md User Story 1
 from src.cli import menu
 from src.services import auth
 from src.services import db
@@ -42,6 +45,7 @@ app.add_middleware(
 app.include_router(health_router.router)
 app.include_router(auth_router.router, prefix="/api")
 app.include_router(tasks_router.router, prefix="/api")
+app.include_router(conversations_router.router, prefix="/api")
 
 
 @app.on_event("startup")

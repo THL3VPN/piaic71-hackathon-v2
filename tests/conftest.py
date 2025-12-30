@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+# [Task]: T002 [From]: specs/008-chat-storage/spec.md User Story 1
+
 import base64
 import hashlib
 import hmac
@@ -53,6 +55,15 @@ def token_factory(test_secret: str):
         return ".".join([header_b64, payload_b64, signature_b64])
 
     return _build
+
+
+@pytest.fixture
+def auth_headers_factory(token_factory):
+    def _headers(sub: str = "test-user", extra: dict | None = None) -> dict[str, str]:
+        token = token_factory(sub=sub, extra=extra)
+        return {"Authorization": f"Bearer {token}"}
+
+    return _headers
 
 
 @pytest.fixture
