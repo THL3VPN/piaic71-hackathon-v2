@@ -58,8 +58,8 @@ description: "Task list for chat storage persistence"
 
 ### Operation: Create Conversation — REFACTOR
 
-- [ ] T011 [US1] Refactor conversation endpoint for clarity in `/home/aie/all_data/piaic71-hackathon-v2/src/api/conversations.py` (deliverable: cleaned endpoint) depends on T009
-- [ ] T012 [US1] Refactor conversation repo for clarity in `/home/aie/all_data/piaic71-hackathon-v2/src/services/conversation_repo.py` (deliverable: cleaned repository) depends on T008
+- [x] T011 [US1] Refactor conversation endpoint for clarity in `/home/aie/all_data/piaic71-hackathon-v2/src/api/conversations.py` (deliverable: cleaned endpoint) depends on T009
+- [x] T012 [US1] Refactor conversation repo for clarity in `/home/aie/all_data/piaic71-hackathon-v2/src/services/conversation_repo.py` (deliverable: cleaned repository) depends on T008
 
 **Checkpoint**: Pause for human review; commit after approval.
 
@@ -73,22 +73,22 @@ description: "Task list for chat storage persistence"
 
 ### Operation: Append Message — RED Tests
 
-- [ ] T013 [P] [US2] Write failing contract test for POST `/api/conversations/{conversation_id}/messages` in `/home/aie/all_data/piaic71-hackathon-v2/tests/contract/test_chat_storage_contract.py` (deliverable: contract assertions) depends on T003
-- [ ] T014 [P] [US2] Write failing integration test for append message in `/home/aie/all_data/piaic71-hackathon-v2/tests/integration/test_chat_storage_api.py` (deliverable: integration scenario) depends on T004
-- [ ] T015 [P] [US2] Write failing unit tests for message repo create + ownership in `/home/aie/all_data/piaic71-hackathon-v2/tests/unit/test_message_repo.py` (deliverable: repo tests) depends on T001
+- [x] T013 [P] [US2] Write failing contract test for POST `/api/conversations/{conversation_id}/messages` in `/home/aie/all_data/piaic71-hackathon-v2/tests/contract/test_chat_storage_contract.py` (deliverable: contract assertions) depends on T003
+- [x] T014 [P] [US2] Write failing integration test for append message in `/home/aie/all_data/piaic71-hackathon-v2/tests/integration/test_chat_storage_api.py` (deliverable: integration scenario) depends on T004
+- [x] T015 [P] [US2] Write failing unit tests for message repo create + ownership in `/home/aie/all_data/piaic71-hackathon-v2/tests/unit/test_message_repo.py` (deliverable: repo tests) depends on T001
 
 ### Operation: Append Message — GREEN Implementation
 
-- [ ] T016 [P] [US2] Add Message model in `/home/aie/all_data/piaic71-hackathon-v2/src/models/message.py` (deliverable: SQLModel for messages) depends on T015
-- [ ] T017 [P] [US2] Add message schemas in `/home/aie/all_data/piaic71-hackathon-v2/src/api/schemas.py` (deliverable: MessageCreate/MessageRead) depends on T013
-- [ ] T018 [US2] Implement message repository create in `/home/aie/all_data/piaic71-hackathon-v2/src/services/message_repo.py` (deliverable: create function with ownership check) depends on T016,T008
-- [ ] T019 [US2] Update conversation updated_at on message append in `/home/aie/all_data/piaic71-hackathon-v2/src/services/conversation_repo.py` (deliverable: updated_at update) depends on T018
-- [ ] T020 [US2] Implement POST message endpoint in `/home/aie/all_data/piaic71-hackathon-v2/src/api/conversations.py` (deliverable: append endpoint) depends on T017,T018,T019
+- [x] T016 [P] [US2] Add Message model in `/home/aie/all_data/piaic71-hackathon-v2/src/models/message.py` (deliverable: SQLModel for messages) depends on T015
+- [x] T017 [P] [US2] Add message schemas in `/home/aie/all_data/piaic71-hackathon-v2/src/api/schemas.py` (deliverable: MessageCreate/MessageRead) depends on T013
+- [x] T018 [US2] Implement message repository create in `/home/aie/all_data/piaic71-hackathon-v2/src/services/message_repo.py` (deliverable: create function with ownership check) depends on T016,T008
+- [x] T019 [US2] Update conversation updated_at on message append in `/home/aie/all_data/piaic71-hackathon-v2/src/services/conversation_repo.py` (deliverable: updated_at update) depends on T018
+- [x] T020 [US2] Implement POST message endpoint in `/home/aie/all_data/piaic71-hackathon-v2/src/api/conversations.py` (deliverable: append endpoint) depends on T017,T018,T019
 
 ### Operation: Append Message — REFACTOR
 
-- [ ] T021 [US2] Refactor message endpoint for clarity in `/home/aie/all_data/piaic71-hackathon-v2/src/api/conversations.py` (deliverable: cleaned endpoint) depends on T020
-- [ ] T022 [US2] Refactor message repo for clarity in `/home/aie/all_data/piaic71-hackathon-v2/src/services/message_repo.py` (deliverable: cleaned repository) depends on T018
+- [x] T021 [US2] Refactor message endpoint for clarity in `/home/aie/all_data/piaic71-hackathon-v2/src/api/conversations.py` (deliverable: cleaned endpoint) depends on T020
+- [x] T022 [US2] Refactor message repo for clarity in `/home/aie/all_data/piaic71-hackathon-v2/src/services/message_repo.py` (deliverable: cleaned repository) depends on T018
 
 **Checkpoint**: Pause for human review; commit after approval.
 
@@ -102,7 +102,7 @@ description: "Task list for chat storage persistence"
 
 ### Operation: Retrieve History — RED Tests
 
-- [ ] T023 [P] [US3] Write failing contract test for GET `/api/conversations/{conversation_id}/messages` in `/home/aie/all_data/piaic71-hackathon-v2/tests/contract/test_chat_storage_contract.py` (deliverable: contract assertions) depends on T013
+- [x] T023 [P] [US3] Write failing contract test for GET `/api/conversations/{conversation_id}/messages` in `/home/aie/all_data/piaic71-hackathon-v2/tests/contract/test_chat_storage_contract.py` (deliverable: contract assertions) depends on T013
 - [ ] T024 [P] [US3] Write failing integration test for history retrieval ordering/limit in `/home/aie/all_data/piaic71-hackathon-v2/tests/integration/test_chat_storage_api.py` (deliverable: integration scenario) depends on T014
 - [ ] T025 [P] [US3] Write failing unit tests for history query ordering/limit in `/home/aie/all_data/piaic71-hackathon-v2/tests/unit/test_message_repo.py` (deliverable: repo tests) depends on T015
 
