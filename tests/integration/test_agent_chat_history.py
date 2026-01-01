@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 # [Task]: T018 [From]: specs/012-ai-agent-integration/spec.md User Story 3
+# [Task]: T021 [From]: specs/013-agent-tool-calls/tasks.md Align agent chat tests
 
 import pytest
 
@@ -21,6 +22,7 @@ async def test_agent_history_limit_applied(tmp_path, monkeypatch: pytest.MonkeyP
         user_id: str,
         model: object,
         system_instructions: str,
+        session: object,
     ):
         return agent_runtime.AgentResult(response="ok", tool_calls=[])
 
@@ -37,6 +39,7 @@ async def test_agent_history_limit_applied(tmp_path, monkeypatch: pytest.MonkeyP
         user_id: str,
         model: object,
         system_instructions: str,
+        session: object,
     ):
         captured["history"] = history
         return agent_runtime.AgentResult(response="ok", tool_calls=[])
