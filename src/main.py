@@ -12,6 +12,7 @@ from src.api import health as health_router
 from src.api import tasks as tasks_router
 from src.api import auth as auth_router
 from src.api import conversations as conversations_router
+from src.api import chat as chat_router
 
 # [Task]: T010 [From]: specs/008-chat-storage/spec.md User Story 1
 from src.cli import menu
@@ -46,6 +47,8 @@ app.include_router(health_router.router)
 app.include_router(auth_router.router, prefix="/api")
 app.include_router(tasks_router.router, prefix="/api")
 app.include_router(conversations_router.router, prefix="/api")
+# [Task]: T010 [From]: specs/010-stateless-chat/spec.md User Story 1
+app.include_router(chat_router.router, prefix="/api")
 
 
 @app.on_event("startup")

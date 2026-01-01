@@ -45,6 +45,19 @@ class MessageRead(SQLModel):
     role: str
     content: str
     created_at: datetime
+
+
+# [Task]: T004 [From]: specs/010-stateless-chat/spec.md User Story 1
+class ChatRequest(SQLModel):
+    conversation_id: int | None = None
+    message: str = Field(..., min_length=1)
+
+
+# [Task]: T004 [From]: specs/010-stateless-chat/spec.md User Story 1
+class ChatResponse(SQLModel):
+    conversation_id: int
+    response: str
+    tool_calls: list[dict[str, object]]
 class RegisterRequest(SQLModel):
     username: str = Field(..., min_length=1)
     password: str = Field(..., min_length=6)
