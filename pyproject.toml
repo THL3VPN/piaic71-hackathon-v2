@@ -20,4 +20,5 @@ dependencies = [
     "typer>=0.20.0",
     "uvicorn>=0.38.0",
     "pyjwt>=2.3.0",
+    "openai>=2.14.0",
 ]
