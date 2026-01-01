@@ -186,6 +186,8 @@ This ensures predictable, deterministic development.
 - Neon PostgreSQL via `DATABASE_URL`; tasks and users in SQLModel. (001-user-pass-tasks)
 - Python 3.13 (meets Python 3.12+ requirement) + FastAPI, SQLModel, SQLAlchemy (async), psycopg, uvicorn, pytest, pytest-cov, httpx (008-chat-storage)
 - Neon PostgreSQL via `DATABASE_URL` (async engine) (008-chat-storage)
+- Python 3.12+ (repo uses 3.13) + fastapi, sqlmodel, psycopg, uvicorn, pytest, pytest-cov, httpx (009-message-history-read)
+- Neon Serverless PostgreSQL (via `DATABASE_URL`) (009-message-history-read)
 
 ## Recent Changes
 - 001-interactive-todo-cli: Added Python 3.12+ (required) + UV-managed Python packages: typer (entry wrapper), questionary (interactive menus), rich (tables/messages), pytest (tests)

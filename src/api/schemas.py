@@ -6,6 +6,7 @@ from typing import Optional
 from sqlmodel import Field, SQLModel
 
 # [Task]: T007 [From]: specs/008-chat-storage/spec.md User Story 1
+# [Task]: T017 [From]: specs/008-chat-storage/spec.md User Story 2
 
 
 class TaskBase(SQLModel):
@@ -31,6 +32,19 @@ class ConversationCreateResponse(SQLModel):
     id: int
     created_at: datetime
     updated_at: datetime
+
+
+class MessageCreate(SQLModel):
+    role: str = Field(..., min_length=1)
+    content: str = Field(..., min_length=1)
+
+
+class MessageRead(SQLModel):
+    id: int
+    conversation_id: int
+    role: str
+    content: str
+    created_at: datetime
 class RegisterRequest(SQLModel):
     username: str = Field(..., min_length=1)
     password: str = Field(..., min_length=6)
