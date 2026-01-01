@@ -190,6 +190,7 @@ This ensures predictable, deterministic development.
 - Neon Serverless PostgreSQL (via `DATABASE_URL`) (009-message-history-read)
 - Python 3.12+ (repo uses 3.13) + fastapi, uvicorn, sqlmodel, psycopg, openai (Agents SDK), pytest (013-agent-tool-calls)
 - PostgreSQL (Neon via `DATABASE_URL`) (013-agent-tool-calls)
+- Python 3.12+ (repo uses 3.13) + fastapi, uvicorn, sqlmodel, psycopg, openai (Agents SDK), pytest, official MCP SDK (015-mcp-server-extraction)
 
 ## Recent Changes
 - 001-interactive-todo-cli: Added Python 3.12+ (required) + UV-managed Python packages: typer (entry wrapper), questionary (interactive menus), rich (tables/messages), pytest (tests)

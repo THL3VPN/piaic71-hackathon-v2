@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.services.chat_model_factory import ChatModel, ModelFactoryError, build_chat_model
 from src.services.chat_provider import load_provider_settings
-from src.services import agent_tools, task_tools
+from src.services import agent_tools, mcp_client, task_tools
 
 # [Task]: T009 [From]: specs/012-ai-agent-integration/spec.md User Story 1
 # [Task]: T019 [From]: specs/012-ai-agent-integration/spec.md User Story 3
@@ -116,6 +116,40 @@ def _build_tool_call_payload(name: str, args: dict[str, Any], result: dict[str, 
     return {"name": name, "arguments": args, "result": result}
 
 
+async def _dispatch_mcp_tool(name: str, args: dict[str, Any], user_id: str) -> Any:
+    match name:
+        case "add_task":
+            return await mcp_client.call_add_task(
+                user_id=user_id,
+                title=args.get("title"),
+                description=args.get("description"),
+            )
+        case "list_tasks":
+            return await mcp_client.call_list_tasks(
+                user_id=user_id,
+                status=args.get("status"),
+            )
+        case "complete_task":
+            return await mcp_client.call_complete_task(
+                user_id=user_id,
+                task_id=args.get("task_id"),
+            )
+        case "delete_task":
+            return await mcp_client.call_delete_task(
+                user_id=user_id,
+                task_id=args.get("task_id"),
+            )
+        case "update_task":
+            return await mcp_client.call_update_task(
+                user_id=user_id,
+                task_id=args.get("task_id"),
+                title=args.get("title"),
+                description=args.get("description"),
+            )
+        case _:
+            raise mcp_client.McpClientError(f"Unknown tool: {name}")
+
+
 async def _execute_agent(
     *,
     user_message: str,
@@ -167,13 +201,20 @@ async def _execute_agent(
     tool_call_payloads: list[dict[str, object]] = []
     tool_error = False
     for call in tool_calls:
-        tool = tool_map.get(call.function.name)
         args = _parse_tool_call_arguments(call.function.arguments)
+        args.pop("user_id", None)
+        tool = tool_map.get(call.function.name)
         if tool is None:
             continue
         try:
-            result = await tool.handler(session, user_id, args)
-        except task_tools.TaskToolError as exc:
+            result = await _dispatch_mcp_tool(call.function.name, args, user_id)
+        except mcp_client.McpConfigError:
+            try:
+                result = await tool.handler(session, user_id, args)
+            except task_tools.TaskToolError as exc:
+                result = {"error": str(exc)}
+                tool_error = True
+        except mcp_client.McpClientError as exc:
             result = {"error": str(exc)}
             tool_error = True
         tool_call_payloads.append(_build_tool_call_payload(call.function.name, args, result))
