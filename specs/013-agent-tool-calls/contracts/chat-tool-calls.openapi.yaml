@@ -1,0 +1,71 @@
+openapi: 3.0.3
+info:
+  title: Chat Tool Calls
+  version: 1.0.0
+paths:
+  /api/chat:
+    post:
+      summary: Execute chat with tool calls
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                conversation_id:
+                  type: integer
+                  nullable: true
+                message:
+                  type: string
+              required:
+                - message
+      responses:
+        "200":
+          description: Chat response with tool calls
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  conversation_id:
+                    type: integer
+                  response:
+                    type: string
+                  tool_calls:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ToolCall"
+                required:
+                  - conversation_id
+                  - response
+                  - tool_calls
+        "401":
+          description: Unauthorized
+        "404":
+          description: Conversation not found
+        "422":
+          description: Validation error
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    ToolCall:
+      type: object
+      properties:
+        name:
+          type: string
+        arguments:
+          type: object
+          additionalProperties: true
+        result:
+          type: object
+          additionalProperties: true
+      required:
+        - name
+        - arguments
+        - result

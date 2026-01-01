@@ -1,0 +1,58 @@
+openapi: 3.0.3
+info:
+  title: AI Agent Chat Endpoint
+  version: 1.0.0
+paths:
+  /api/chat:
+    post:
+      summary: Chat with AI agent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - message
+              properties:
+                conversation_id:
+                  type: integer
+                message:
+                  type: string
+      responses:
+        "200":
+          description: Agent response with tool calls
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - conversation_id
+                  - response
+                  - tool_calls
+                properties:
+                  conversation_id:
+                    type: integer
+                  response:
+                    type: string
+                  tool_calls:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - name
+                        - arguments
+                        - result
+                      properties:
+                        name:
+                          type: string
+                        arguments:
+                          type: object
+                        result:
+                          type: object
+        "401":
+          description: Unauthorized
+        "404":
+          description: Conversation not found
+        "422":
+          description: Validation error
