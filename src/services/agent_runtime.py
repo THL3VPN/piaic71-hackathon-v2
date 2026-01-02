@@ -14,6 +14,7 @@ from src.services import agent_tools, mcp_client, task_tools
 # [Task]: T019 [From]: specs/012-ai-agent-integration/spec.md User Story 3
 # [Task]: T009 [From]: specs/013-agent-tool-calls/spec.md User Story 1
 # [Task]: T010 [From]: specs/013-agent-tool-calls/spec.md User Story 1
+# [Task]: T003 [From]: specs/019-agent-tool-chaining/spec.md User Story 1
 
 
 @dataclass(frozen=True)
@@ -199,32 +200,37 @@ async def _execute_agent(
     messages.append(assistant_message)
 
     tool_call_payloads: list[dict[str, object]] = []
-    tool_error = False
-    for call in tool_calls:
-        args = _parse_tool_call_arguments(call.function.arguments)
-        args.pop("user_id", None)
-        tool = tool_map.get(call.function.name)
-        if tool is None:
-            continue
-        try:
-            result = await _dispatch_mcp_tool(call.function.name, args, user_id)
-        except mcp_client.McpConfigError:
+
+    async def _apply_tool_calls(calls: list[Any]) -> bool:
+        tool_error = False
+        for call in calls:
+            args = _parse_tool_call_arguments(call.function.arguments)
+            args.pop("user_id", None)
+            tool = tool_map.get(call.function.name)
+            if tool is None:
+                continue
             try:
-                result = await tool.handler(session, user_id, args)
-            except task_tools.TaskToolError as exc:
+                result = await _dispatch_mcp_tool(call.function.name, args, user_id)
+            except mcp_client.McpConfigError:
+                try:
+                    result = await tool.handler(session, user_id, args)
+                except task_tools.TaskToolError as exc:
+                    result = {"error": str(exc)}
+                    tool_error = True
+            except mcp_client.McpClientError as exc:
                 result = {"error": str(exc)}
                 tool_error = True
-        except mcp_client.McpClientError as exc:
-            result = {"error": str(exc)}
-            tool_error = True
-        tool_call_payloads.append(_build_tool_call_payload(call.function.name, args, result))
-        messages.append(
-            {
-                "role": "tool",
-                "tool_call_id": call.id,
-                "content": json.dumps(result, separators=(",", ":")),
-            }
-        )
+            tool_call_payloads.append(_build_tool_call_payload(call.function.name, args, result))
+            messages.append(
+                {
+                    "role": "tool",
+                    "tool_call_id": call.id,
+                    "content": json.dumps(result, separators=(",", ":")),
+                }
+            )
+        return tool_error
+
+    tool_error = await _apply_tool_calls(tool_calls)
 
     if tool_error:
         return AgentResult(response=_tool_error_response(), tool_calls=tool_call_payloads)
@@ -236,6 +242,38 @@ async def _execute_agent(
         tool_specs=tool_specs,
     )
     second_message = second_response.choices[0].message
+    second_tool_calls = getattr(second_message, "tool_calls", None) or []
+    if second_tool_calls:
+        messages.append(
+            {
+                "role": "assistant",
+                "content": second_message.content or "",
+                "tool_calls": [
+                    {
+                        "id": call.id,
+                        "type": "function",
+                        "function": {
+                            "name": call.function.name,
+                            "arguments": call.function.arguments,
+                        },
+                    }
+                    for call in second_tool_calls
+                ],
+            }
+        )
+        tool_error = await _apply_tool_calls(second_tool_calls)
+        if tool_error:
+            return AgentResult(response=_tool_error_response(), tool_calls=tool_call_payloads)
+        third_response = await _request_completion(
+            client=model.client,
+            model_name=model.model_name,
+            messages=messages,
+            tool_specs=tool_specs,
+        )
+        third_message = third_response.choices[0].message
+        response_text = third_message.content or _fallback_response()
+        return AgentResult(response=response_text, tool_calls=tool_call_payloads)
+
     response_text = second_message.content or _fallback_response()
     return AgentResult(response=response_text, tool_calls=tool_call_payloads)
 
