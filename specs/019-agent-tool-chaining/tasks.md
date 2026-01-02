@@ -26,3 +26,6 @@ description: "Task list for agent tool chaining fix"
 ### Verification
 
 - [x] T004 [US1] Run unit + contract tests for tool chaining (`tests/unit/test_agent_runtime_tools.py`, `tests/contract/test_agent_behavior_chain_contract.py`)
+- [x] T005 [P] [US1] Add unit test for MCP tool result unwrapping in `tests/unit/test_mcp_client.py`
+- [x] T006 [US1] Unwrap MCP tool results with single `result` key in `src/services/mcp_client.py`
+- [x] T007 [US1] Run unit test for MCP tool result unwrapping (`tests/unit/test_mcp_client.py`)
