@@ -1,0 +1,101 @@
+openapi: 3.0.3
+info:
+  title: MCP Task Tools
+  version: 1.0.0
+paths:
+  /mcp/tools/add_task:
+    post:
+      summary: MCP add_task tool
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                title:
+                  type: string
+                description:
+                  type: string
+              required: [user_id, title]
+      responses:
+        "200":
+          description: Tool result
+  /mcp/tools/list_tasks:
+    post:
+      summary: MCP list_tasks tool
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                status:
+                  type: string
+              required: [user_id]
+      responses:
+        "200":
+          description: Tool result
+  /mcp/tools/complete_task:
+    post:
+      summary: MCP complete_task tool
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                task_id:
+                  type: integer
+              required: [user_id, task_id]
+      responses:
+        "200":
+          description: Tool result
+  /mcp/tools/delete_task:
+    post:
+      summary: MCP delete_task tool
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                task_id:
+                  type: integer
+              required: [user_id, task_id]
+      responses:
+        "200":
+          description: Tool result
+  /mcp/tools/update_task:
+    post:
+      summary: MCP update_task tool
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                task_id:
+                  type: integer
+                title:
+                  type: string
+                description:
+                  type: string
+              required: [user_id, task_id]
+      responses:
+        "200":
+          description: Tool result
