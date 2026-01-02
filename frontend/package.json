@@ -15,6 +15,7 @@
     "react-dom": "18.3.0"
   },
   "devDependencies": {
+    "autoprefixer": "^10.4.19",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@types/node": "20.5.9",
@@ -26,6 +27,8 @@
     "eslint-plugin-next": "^0.0.0",
     "eslint-plugin-react": "^7.37.5",
     "jsdom": "^27.3.0",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.1",
     "typescript": "5.3.2",
     "vitest": "^4.0.15"
   }

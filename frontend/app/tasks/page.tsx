@@ -11,8 +11,10 @@ import {
 } from "../../lib/tasks";
 import { Task } from "../../lib/types";
 import { clearSession, getUsername } from "../../lib/auth";
+import { isWidgetAvailable } from "../../lib/chatWidget";
 import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import ChatWidget from "../components/chat-widget";
 
 const tabs = [
   { id: "view", label: "View tasks" },
@@ -30,6 +32,17 @@ export default function TasksPage() {
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => isWidgetAvailable());
+
+  useEffect(() => {
+    function handleStorage(event: StorageEvent) {
+      if (event.key === "auth_token") {
+        setIsAuthenticated(isWidgetAvailable());
+      }
+    }
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
 
   useEffect(() => {
     refresh();
@@ -94,19 +107,12 @@ export default function TasksPage() {
               {username}
             </span>
           )}
-          {/* [Task]: T011 [From]: specs/016-chat-ui-integration/spec.md */}
-          <button
-            type="button"
-            className="form-button-secondary"
-            onClick={() => router.push("/chat")}
-          >
-            Chat
-          </button>
           <button
             type="button"
             className="form-button-secondary"
             onClick={() => {
               clearSession();
+              setIsAuthenticated(false);
               router.push("/");
             }}
           >
@@ -229,6 +235,8 @@ export default function TasksPage() {
           </form>
         )}
       </section>
+      {/* [Task]: T006, T011, T024 [From]: specs/017-add-chat-widget/spec.md */}
+      <ChatWidget isAuthenticated={isAuthenticated} />
     </main>
   );
 }

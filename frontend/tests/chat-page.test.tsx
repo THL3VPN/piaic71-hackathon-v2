@@ -7,7 +7,7 @@ vi.mock("../lib/chat", () => ({
   getConversationMessages: vi.fn(),
 }));
 
-// [Task]: T007, T008, T021 [From]: specs/016-chat-ui-integration/spec.md
+// [Task]: T005 [From]: specs/017-add-chat-widget/spec.md
 const { sendChatMessage, getConversationMessages } = await import("../lib/chat");
 const sendChatMessageMock = vi.mocked(sendChatMessage);
 const getConversationMessagesMock = vi.mocked(getConversationMessages);
@@ -59,7 +59,7 @@ describe("ChatPage", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: /send/i }));
 
-    expect(await screen.findByText(/waiting for response/i)).toBeInTheDocument();
+    expect(await screen.findByText(/assistant is typing/i)).toBeInTheDocument();
 
     await act(async () => {
       resolveReply!({ conversation_id: 2, response: "Here you go.", tool_calls: [] });
@@ -73,7 +73,7 @@ describe("ChatPage", () => {
 
     render(<ChatPage />);
 
-    expect(screen.getByText(/start with a request like/i)).toBeInTheDocument();
+    expect(screen.getByText(/try one of these/i)).toBeInTheDocument();
   });
 
   it("shows an error and allows retry", async () => {
