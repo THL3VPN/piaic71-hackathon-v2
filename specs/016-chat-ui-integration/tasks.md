@@ -113,7 +113,7 @@ description: "Task list template for feature implementation"
 
 - [x] T020 [P] Add empty state + error retry UI in `frontend/app/chat/page.tsx`
 - [x] T021 [P] Add error/empty state tests in `frontend/tests/chat-page.test.tsx`
-- [ ] T022 Run quickstart validation in `specs/016-chat-ui-integration/quickstart.md`
+- [x] T022 Run quickstart validation in `specs/016-chat-ui-integration/quickstart.md`
 
 ---
 
