@@ -1,13 +1,76 @@
 from __future__ import annotations
 
 # [Task]: T005 [From]: specs/012-ai-agent-integration/spec.md User Story 1
+# [Task]: T021 [From]: specs/013-agent-tool-calls/tasks.md Align agent chat tests
 
 from fastapi.testclient import TestClient
 
 from src.main import app
+from src.services import agent_runtime, chat_model_factory
 
 
-def test_agent_chat_contract_includes_tool_calls(auth_headers_factory) -> None:
+class _FakeFunction:
+    def __init__(self, name: str, arguments: str):
+        self.name = name
+        self.arguments = arguments
+
+
+class _FakeToolCall:
+    def __init__(self, call_id: str, name: str, arguments: str):
+        self.id = call_id
+        self.function = _FakeFunction(name=name, arguments=arguments)
+
+
+class _FakeMessage:
+    def __init__(self, content: str, tool_calls=None):
+        self.content = content
+        self.tool_calls = tool_calls or []
+
+
+class _FakeChoice:
+    def __init__(self, message):
+        self.message = message
+
+
+class _FakeResponse:
+    def __init__(self, message):
+        self.choices = [_FakeChoice(message)]
+
+
+def _setup_fake_agent(monkeypatch) -> None:
+    responses = [
+        _FakeResponse(
+            _FakeMessage(
+                content="",
+                tool_calls=[
+                    _FakeToolCall("call-1", "add_task", '{"title":"buy milk"}')
+                ],
+            )
+        ),
+        _FakeResponse(_FakeMessage(content="Done")),
+    ]
+
+    async def _fake_request_completion(*, client, model_name, messages, tool_specs):
+        return responses.pop(0)
+
+    monkeypatch.setattr(
+        agent_runtime,
+        "_request_completion",
+        _fake_request_completion,
+    )
+    monkeypatch.setattr(
+        agent_runtime,
+        "build_chat_model",
+        lambda settings: chat_model_factory.ChatModel(
+            provider="openai",
+            model_name="gpt-test",
+            client=object(),
+        ),
+    )
+
+
+def test_agent_chat_contract_includes_tool_calls(auth_headers_factory, monkeypatch) -> None:
+    _setup_fake_agent(monkeypatch)
     headers = auth_headers_factory("agent-contract-user")
     with TestClient(app) as client:
         resp = client.post(

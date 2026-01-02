@@ -113,6 +113,7 @@ description: "Task list template for feature implementation"
 
 - [x] T019 Run quickstart validation in `specs/013-agent-tool-calls/quickstart.md`
 - [x] T020 Update implementation notes if needed in `specs/013-agent-tool-calls/plan.md`
+- [x] T021 Align agent chat tests with provider-backed responses in `tests/contract/test_agent_chat_contract.py`, `tests/contract/test_stateless_chat_contract.py`, `tests/integration/test_agent_chat_api.py`, `tests/integration/test_agent_chat_history.py`, `tests/unit/test_stateless_chat_service.py`
 
 ---
 

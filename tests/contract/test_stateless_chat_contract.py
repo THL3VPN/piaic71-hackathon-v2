@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 # [Task]: T005 [From]: specs/010-stateless-chat/spec.md User Story 1
+# [Task]: T021 [From]: specs/013-agent-tool-calls/tasks.md Align agent chat tests
 
 from fastapi.testclient import TestClient
 
@@ -18,7 +19,9 @@ def test_stateless_chat_contract(auth_headers_factory) -> None:
         assert resp.status_code == 200
         payload = resp.json()
         assert "conversation_id" in payload
-        assert payload["response"].startswith("OK (dummy):")
+        response = payload["response"]
+        assert isinstance(response, str)
+        assert response
         assert payload["tool_calls"] == []
 
         history = client.get(f"/api/conversations/{payload['conversation_id']}/messages", headers=headers)

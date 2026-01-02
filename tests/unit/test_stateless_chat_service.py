@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 # [Task]: T007 [From]: specs/010-stateless-chat/spec.md User Story 1
+# [Task]: T021 [From]: specs/013-agent-tool-calls/tasks.md Align agent chat tests
 
 import pytest
 
@@ -17,7 +18,8 @@ async def test_chat_service_creates_conversation_and_messages(session) -> None:
         message="Hello",
     )
     assert result.conversation_id is not None
-    assert result.response.startswith("OK (dummy):")
+    assert isinstance(result.response, str)
+    assert result.response
     assert result.tool_calls == []
 
     messages = await message_repo.list_messages(
