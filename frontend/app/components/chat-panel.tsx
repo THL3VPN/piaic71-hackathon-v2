@@ -1,6 +1,7 @@
 "use client";
 
 // [Task]: T004, T010, T015, T021, T023 [From]: specs/017-add-chat-widget/spec.md
+// [Task]: T004, T005, T008, T009, T011, T012, T013, T015, T017 [From]: specs/018-chat-widget-polish/spec.md
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { getConversationMessages, sendChatMessage } from "../../lib/chat";
 import { clearActiveConversationId, setActiveConversationId } from "../../lib/chatStorage";
@@ -27,6 +28,17 @@ const emptyHints = [
   "Delete the meeting task",
   "Change task 1 to 'Call mom tonight'",
 ];
+
+function formatMessageContent(content: string): string {
+  const trimmed = content.trim();
+  if (!trimmed) {
+    return content;
+  }
+
+  const withNumberedBreaks = trimmed.replace(/\s+(?=\d+\.\s)/g, "\n");
+  const withBoldBreaks = withNumberedBreaks.replace(/\s+(?=\*\*[^*]+\*\*\s*-)/g, "\n");
+  return withBoldBreaks.replace(/\*\*/g, "");
+}
 
 function normalizeMessage(message: ChatMessage): ChatMessage {
   return {
@@ -115,20 +127,31 @@ export default function ChatPanel({
     }
   }
 
+  function handleComposerKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      void handleSend(input, true);
+    }
+  }
+
   const showEmptyState = !loadingHistory && orderedMessages.length === 0;
 
   return (
-    <section className="chat-widget-card">
-      <header className="chat-widget-header">
-        <div>
-          <p className="page-header-subtitle">Assistant</p>
-          <h2 className="page-header-title">Todo Assistant</h2>
+    <section className="chat-widget-card flex h-full min-w-0 flex-col overflow-hidden">
+      <header className="chat-widget-header flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-slate-400">
+            Assistant
+          </p>
+          <h2 className="text-base font-semibold leading-tight text-slate-100">
+            Todo Assistant
+          </h2>
         </div>
         {isWidget && (
-          <div className="chat-widget-actions">
+          <div className="chat-widget-actions flex items-center gap-2">
             <button
               type="button"
-              className="form-button-secondary"
+              className="h-8 rounded-full border border-slate-600 px-3 text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
               onClick={() => {
                 clearActiveConversationId();
                 setConversationId(null);
@@ -137,7 +160,11 @@ export default function ChatPanel({
             >
               New chat
             </button>
-            <button type="button" className="form-button-secondary" onClick={onClose}>
+            <button
+              type="button"
+              className="h-8 rounded-full border border-slate-600 px-3 text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+              onClick={onClose}
+            >
               Close
             </button>
           </div>
@@ -150,7 +177,7 @@ export default function ChatPanel({
           {retryMessage && (
             <button
               type="button"
-              className="form-button-secondary"
+              className="form-button-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
               onClick={() => handleSend(retryMessage, false)}
             >
               Retry
@@ -172,15 +199,25 @@ export default function ChatPanel({
         </div>
       )}
 
-      <div className="chat-widget-body">
-        <ul className="task-list">
-          {orderedMessages.map((message, index) => (
-            <li
-              key={`${message.role}-${index}`}
-              className={`task-card ${message.role === "user" ? "chat-bubble-user" : "chat-bubble-assistant"}`}
-            >
-              <div className="task-card-header">
-                <p className="task-card-title">
+      <div className="chat-widget-body flex-1 min-w-0 overflow-x-hidden overflow-y-auto pr-2">
+        <ul className="flex flex-col gap-3">
+          {orderedMessages.map((message, index) => {
+            const displayContent =
+              message.role === "assistant" ? formatMessageContent(message.content) : message.content;
+            return (
+              <li
+                key={`${message.role}-${index}`}
+                className={`rounded-2xl border border-slate-700/60 bg-slate-900/80 px-4 py-3 text-slate-200 shadow-[0_12px_30px_rgba(2,6,23,0.45)] max-w-[85%] break-words ${
+                  message.role === "user"
+                    ? "ml-auto text-left chat-bubble-user"
+                    : "mr-auto text-left chat-bubble-assistant"
+                }`}
+              >
+              <div className="flex items-center justify-between gap-2">
+                <p
+                  className="text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-slate-300"
+                  data-testid="message-role"
+                >
                   {message.role === "user" ? "You" : "Assistant"}
                 </p>
                 {message.created_at && (
@@ -189,12 +226,14 @@ export default function ChatPanel({
                   </span>
                 )}
               </div>
-              <p className="task-card-description">{message.content}</p>
+              <p className="mt-2 whitespace-pre-line break-words text-sm leading-relaxed text-slate-200">
+                {displayContent}
+              </p>
               {message.tool_calls && message.tool_calls.length > 0 && (
                 <div className="card-actions">
                   <button
                     type="button"
-                    className="action-button-ghost"
+                    className="action-button-ghost focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
                     onClick={() =>
                       setExpandedDetails((prev) => ({
                         ...prev,
@@ -205,46 +244,59 @@ export default function ChatPanel({
                     {expandedDetails[index] ? "Hide details" : "Show details"}
                   </button>
                   {expandedDetails[index] && (
-                    <div className="form-error">
+                    <div className="mt-2 rounded-lg bg-slate-950/60 p-2 text-xs text-slate-200 max-w-full break-words">
                       {message.tool_calls.map((call, callIndex) => (
                         <div key={`${call.name}-${callIndex}`}>
                           <strong>{call.name}</strong>
-                          <pre>{JSON.stringify(call.arguments, null, 2)}</pre>
-                          <pre>{JSON.stringify(call.result, null, 2)}</pre>
+                          <pre className="whitespace-pre-wrap break-words">
+                            {JSON.stringify(call.arguments, null, 2)}
+                          </pre>
+                          <pre className="whitespace-pre-wrap break-words">
+                            {JSON.stringify(call.result, null, 2)}
+                          </pre>
                         </div>
                       ))}
                     </div>
                   )}
                 </div>
               )}
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
         {sending && <p className="empty-state">Assistant is typing…</p>}
         <div ref={endRef} />
       </div>
 
       <form
-        className="form"
+        data-testid="chat-composer"
+        className="mt-3 flex items-center gap-3 rounded-2xl border border-slate-800 bg-slate-900/90 p-3"
         onSubmit={(event) => {
           event.preventDefault();
           void handleSend(input, true);
         }}
       >
-        <label className="form-label" htmlFor="chat-message">
+        <label className="form-label sr-only" htmlFor="chat-message">
           Message
         </label>
         <textarea
           id="chat-message"
-          className="form-input"
+          className="flex-1 resize-none rounded-xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
           placeholder="Ask the assistant to manage tasks…"
-          rows={3}
+          rows={1}
           value={input}
           onChange={(event) => setInput(event.target.value)}
+          onKeyDown={handleComposerKeyDown}
           ref={inputRef}
         />
-        <button type="submit" className="form-button" disabled={sending}>
-          {sending ? "Sending…" : "Send"}
+        <button
+          type="submit"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-400 text-slate-900 shadow-[0_10px_25px_rgba(16,185,129,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+          disabled={sending}
+          aria-label="Send"
+        >
+          <span className="sr-only">{sending ? "Sending" : "Send"}</span>
+          <span aria-hidden="true">➤</span>
         </button>
       </form>
     </section>

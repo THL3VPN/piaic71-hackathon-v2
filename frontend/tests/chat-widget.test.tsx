@@ -8,6 +8,7 @@ vi.mock("../lib/chat", () => ({
 }));
 
 // [Task]: T007, T008, T017, T018, T019 [From]: specs/017-add-chat-widget/spec.md
+// [Task]: T006, T010, T014 [From]: specs/018-chat-widget-polish/spec.md
 const { sendChatMessage, getConversationMessages } = await import("../lib/chat");
 const sendChatMessageMock = vi.mocked(sendChatMessage);
 const getConversationMessagesMock = vi.mocked(getConversationMessages);
@@ -109,5 +110,61 @@ describe("ChatWidget", () => {
 
     fireEvent.keyDown(window, { key: "Escape" });
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("renders aligned bubbles and prevents horizontal overflow", async () => {
+    getConversationMessagesMock.mockResolvedValue([
+      { role: "user", content: "Hello" },
+      { role: "assistant", content: "Hi there" },
+    ]);
+    localStorage.setItem("active_conversation_id", "1");
+
+    const { container } = render(<ChatWidget isAuthenticated />);
+
+    fireEvent.click(screen.getByRole("button", { name: /open chat/i }));
+
+    const body = container.querySelector(".chat-widget-body");
+    expect(body).toBeTruthy();
+    expect(body).toHaveClass("overflow-x-hidden");
+
+    const userBubble = (await screen.findByText("Hello")).closest("li");
+    const assistantBubble = (await screen.findByText("Hi there")).closest("li");
+
+    expect(userBubble).toHaveClass("chat-bubble-user");
+    expect(assistantBubble).toHaveClass("chat-bubble-assistant");
+  });
+
+  it("keeps the composer visible and uses a circular send button", async () => {
+    getConversationMessagesMock.mockResolvedValue([]);
+
+    render(<ChatWidget isAuthenticated />);
+
+    fireEvent.click(screen.getByRole("button", { name: /open chat/i }));
+
+    const input = await screen.findByLabelText(/message/i);
+    const form = screen.getByTestId("chat-composer");
+    expect(form).toHaveClass("mt-3");
+
+    const sendButton = screen.getByRole("button", { name: /send/i });
+    expect(sendButton).toHaveClass("rounded-full");
+  });
+
+  it("renders compact message labels for concise replies", async () => {
+    getConversationMessagesMock.mockResolvedValue([
+      { role: "assistant", content: "Added." },
+    ]);
+    localStorage.setItem("active_conversation_id", "2");
+
+    const { container } = render(<ChatWidget isAuthenticated />);
+
+    fireEvent.click(screen.getByRole("button", { name: /open chat/i }));
+
+    await screen.findByText("Added.");
+
+    const labels = container.querySelectorAll(".task-card-title");
+    expect(labels.length).toBeGreaterThan(0);
+    labels.forEach((label) => {
+      expect(label).toHaveClass("text-xs");
+    });
   });
 });
