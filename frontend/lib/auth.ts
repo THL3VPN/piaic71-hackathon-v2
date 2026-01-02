@@ -25,6 +25,7 @@ export function clearToken(): void {
 export function clearSession(): void {
   clearToken();
   localStorage.removeItem("auth_username");
+  localStorage.removeItem("active_conversation_id");
 }
 
 export async function fetchWithAuth(input: string | URL, init: RequestInit = {}): Promise<Response> {

@@ -1,0 +1,76 @@
+openapi: 3.0.3
+info:
+  title: Chat UI Backend Contracts
+  version: 1.0.0
+paths:
+  /api/chat:
+    post:
+      summary: Send a chat message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                conversation_id:
+                  type: integer
+                  nullable: true
+                message:
+                  type: string
+      responses:
+        "200":
+          description: Chat response
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [conversation_id, response, tool_calls]
+                properties:
+                  conversation_id:
+                    type: integer
+                  response:
+                    type: string
+                  tool_calls:
+                    type: array
+                    items:
+                      type: object
+  /api/conversations/{conversation_id}/messages:
+    get:
+      summary: Fetch conversation message history
+      parameters:
+        - name: conversation_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: Message history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required: [id, conversation_id, role, content, created_at]
+                  properties:
+                    id:
+                      type: integer
+                    conversation_id:
+                      type: integer
+                    role:
+                      type: string
+                      enum: [user, assistant]
+                    content:
+                      type: string
+                    created_at:
+                      type: string
+                      format: date-time
