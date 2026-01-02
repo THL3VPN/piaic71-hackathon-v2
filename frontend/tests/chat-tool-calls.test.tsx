@@ -1,13 +1,13 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, expect, it, vi, afterEach, beforeAll } from "vitest";
-import ChatPage from "../app/chat/page";
+import ChatWidget from "../app/components/chat-widget";
 
 vi.mock("../lib/chat", () => ({
   sendChatMessage: vi.fn(),
   getConversationMessages: vi.fn(),
 }));
 
-// [Task]: T017 [From]: specs/016-chat-ui-integration/spec.md
+// [Task]: T020 [From]: specs/017-add-chat-widget/spec.md
 const { sendChatMessage, getConversationMessages } = await import("../lib/chat");
 const sendChatMessageMock = vi.mocked(sendChatMessage);
 const getConversationMessagesMock = vi.mocked(getConversationMessages);
@@ -38,7 +38,9 @@ describe("Chat tool call details", () => {
       ],
     });
 
-    render(<ChatPage />);
+    render(<ChatWidget isAuthenticated />);
+
+    fireEvent.click(screen.getByRole("button", { name: /open chat/i }));
 
     fireEvent.change(screen.getByLabelText(/message/i), {
       target: { value: "Add buy milk" },

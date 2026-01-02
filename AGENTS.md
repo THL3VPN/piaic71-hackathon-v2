@@ -194,6 +194,8 @@ This ensures predictable, deterministic development.
 - Python 3.12+ (required) + UV-managed Python packages [list specifics] (016-chat-ui-integration)
 - TypeScript 5.3 + React 18.3 (Next.js App Router) + next (App Router), react, OpenAI ChatKit, testing-library, vitest (016-chat-ui-integration)
 - Browser local storage for `active_conversation_id`; backend remains source of truth for chat history (016-chat-ui-integration)
+- TypeScript 5.3 + React 18.3 (Next.js App Router) + Next.js, React, Testing Library, Vitest (017-add-chat-widget)
+- Browser storage for conversation identifier (017-add-chat-widget)
 
 ## Recent Changes
 - 001-interactive-todo-cli: Added Python 3.12+ (required) + UV-managed Python packages: typer (entry wrapper), questionary (interactive menus), rich (tables/messages), pytest (tests)
