@@ -94,6 +94,14 @@ export default function TasksPage() {
               {username}
             </span>
           )}
+          {/* [Task]: T011 [From]: specs/016-chat-ui-integration/spec.md */}
+          <button
+            type="button"
+            className="form-button-secondary"
+            onClick={() => router.push("/chat")}
+          >
+            Chat
+          </button>
           <button
             type="button"
             className="form-button-secondary"

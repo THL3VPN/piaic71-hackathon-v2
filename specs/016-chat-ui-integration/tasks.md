@@ -54,14 +54,14 @@ description: "Task list template for feature implementation"
 
 ### Tests for User Story 1 (MANDATORY, write first) ⚠️
 
-- [ ] T007 [P] [US1] RED chat send flow test in `frontend/tests/chat-page.test.tsx`
-- [ ] T008 [P] [US1] RED loading + optimistic message test in `frontend/tests/chat-page.test.tsx`
+- [x] T007 [P] [US1] RED chat send flow test in `frontend/tests/chat-page.test.tsx`
+- [x] T008 [P] [US1] RED loading + optimistic message test in `frontend/tests/chat-page.test.tsx`
 
 ### Implementation for User Story 1
 
-- [ ] T009 [US1] Implement chat composer + message list using ChatKit in `frontend/app/chat/page.tsx`
-- [ ] T010 [US1] Wire send flow to chat client in `frontend/app/chat/page.tsx`
-- [ ] T011 [US1] Add chat entry link/button in `frontend/app/tasks/page.tsx`
+- [x] T009 [US1] Implement chat composer + message list using ChatKit in `frontend/app/chat/page.tsx`
+- [x] T010 [US1] Wire send flow to chat client in `frontend/app/chat/page.tsx`
+- [x] T011 [US1] Add chat entry link/button in `frontend/app/tasks/page.tsx`
 
 **Checkpoint**: User can send a message and receive a reply in the chat UI
 
@@ -75,14 +75,14 @@ description: "Task list template for feature implementation"
 
 ### Tests for User Story 2 (MANDATORY, write first) ⚠️
 
-- [ ] T012 [P] [US2] RED history load test in `frontend/tests/chat-history.test.tsx`
-- [ ] T013 [P] [US2] RED conversation_id persistence test in `frontend/tests/chat-history.test.tsx`
+- [x] T012 [P] [US2] RED history load test in `frontend/tests/chat-history.test.tsx`
+- [x] T013 [P] [US2] RED conversation_id persistence test in `frontend/tests/chat-history.test.tsx`
 
 ### Implementation for User Story 2
 
-- [ ] T014 [US2] Persist and reuse conversation_id in `frontend/app/chat/page.tsx`
-- [ ] T015 [US2] Load message history on mount in `frontend/app/chat/page.tsx`
-- [ ] T016 [US2] Handle missing/invalid history gracefully in `frontend/app/chat/page.tsx`
+- [x] T014 [US2] Persist and reuse conversation_id in `frontend/app/chat/page.tsx`
+- [x] T015 [US2] Load message history on mount in `frontend/app/chat/page.tsx`
+- [x] T016 [US2] Handle missing/invalid history gracefully in `frontend/app/chat/page.tsx`
 
 **Checkpoint**: Refreshing the page preserves conversation and history
 
@@ -96,12 +96,12 @@ description: "Task list template for feature implementation"
 
 ### Tests for User Story 3 (MANDATORY, write first) ⚠️
 
-- [ ] T017 [P] [US3] RED tool call details toggle test in `frontend/tests/chat-tool-calls.test.tsx`
+- [x] T017 [P] [US3] RED tool call details toggle test in `frontend/tests/chat-tool-calls.test.tsx`
 
 ### Implementation for User Story 3
 
-- [ ] T018 [US3] Render tool call details in `frontend/app/chat/page.tsx`
-- [ ] T019 [US3] Add collapsible toggle UI in `frontend/app/chat/page.tsx`
+- [x] T018 [US3] Render tool call details in `frontend/app/chat/page.tsx`
+- [x] T019 [US3] Add collapsible toggle UI in `frontend/app/chat/page.tsx`
 
 **Checkpoint**: Tool calls are visible when toggled
 
@@ -111,8 +111,8 @@ description: "Task list template for feature implementation"
 
 **Purpose**: Error/empty states and validation
 
-- [ ] T020 [P] Add empty state + error retry UI in `frontend/app/chat/page.tsx`
-- [ ] T021 [P] Add error/empty state tests in `frontend/tests/chat-page.test.tsx`
+- [x] T020 [P] Add empty state + error retry UI in `frontend/app/chat/page.tsx`
+- [x] T021 [P] Add error/empty state tests in `frontend/tests/chat-page.test.tsx`
 - [ ] T022 Run quickstart validation in `specs/016-chat-ui-integration/quickstart.md`
 
 ---
