@@ -83,6 +83,9 @@ def _extract_error_message(result: mcp_types.CallToolResult) -> str:
 
 def _extract_tool_result(result: mcp_types.CallToolResult) -> Any:
     if result.structuredContent is not None:
+        if isinstance(result.structuredContent, dict):
+            if set(result.structuredContent.keys()) == {"result"}:
+                return result.structuredContent["result"]
         return result.structuredContent
     if not result.content:
         return {}
